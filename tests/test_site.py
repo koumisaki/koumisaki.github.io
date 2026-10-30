@@ -285,7 +285,7 @@ class TestPublications(unittest.TestCase):
             "2602.04344": ["masked diffusion language models", "multiple models collaborate",
                            "Monte Carlo tree search", "coding benchmarks", "math"],
             "2510.21150": ["make choices according to given probabilities", "fair coin", "prompting alone", "random string", "more diverse"],
-            "2503.04412": ["We propose AB-MCTS", "Bayesian", "refine an existing one",
+            "2503.04412": ["We propose AB-MCTS", "using Bayesian reward modeling,", "refine an existing one",
                            "As part of this work, I developed TreeQuest"],
         }
         for arxiv, phrases in expected.items():
