@@ -70,7 +70,7 @@ KEYWORDS = {
 THUMBNAILS = {
     "2602.04344": ("/images/papers/unmaskfork.webp", "https://pub.sakana.ai/umf/"),
     "2510.21150": ("/images/papers/ssot.webp", "https://pub.sakana.ai/ssot/"),
-    "2503.04412": ("/images/papers/ab-mcts.webp", "https://sakana.ai/ab-mcts/"),
+    "2503.04412": ("/images/papers/ab-mcts-schematic.webp", "https://sakana.ai/ab-mcts/"),
 }
 
 LINKS = [
@@ -198,8 +198,8 @@ class TestProfile(unittest.TestCase):
 class TestPublications(unittest.TestCase):
     def setUp(self):
         self.doc = parse("index.html")
-        self.first = find(self.doc, "section", attr=("id", "research"))
-        self.other = find(self.doc, "section", attr=("id", "other-papers"))
+        self.first = find(self.doc, "section", attr=("id", "selected-publications"))
+        self.other = find(self.doc, "section", attr=("id", "other-publications"))
         self.papers = find_all(self.doc, "li", cls="paper")
 
     def paper(self, arxiv):
@@ -209,9 +209,9 @@ class TestPublications(unittest.TestCase):
         return [(self.first, FIRST_AUTHOR, True), (self.other, OTHER, False)]
 
     def test_own_papers_come_before_the_rest(self):
-        self.assertEqual([s.attrs.get("id") for s in find_all(self.doc, "section")], ["research", "other-papers"])
-        self.assertEqual(text(find(self.first, "h2")), "Research")
-        self.assertEqual(text(find(self.other, "h2")), "Other papers")
+        self.assertEqual([s.attrs.get("id") for s in find_all(self.doc, "section")], ["selected-publications", "other-publications"])
+        self.assertEqual(text(find(self.first, "h2")), "Selected Publications")
+        self.assertEqual(text(find(self.other, "h2")), "Other Publications")
 
     def test_order(self):
         for section, papers, _ in self.groups():
@@ -239,9 +239,18 @@ class TestPublications(unittest.TestCase):
     def test_venue_badge_comes_first(self):
         for li in self.papers:
             with self.subTest(arxiv=li.attrs.get("data-arxiv")):
-                body = elements(li)[0]
-                self.assertEqual(body.classes, ["paper-body"])
-                self.assertEqual(elements(body)[0].classes, ["venue"])
+                head = elements(li)[0]
+                self.assertEqual(head.classes, ["paper-head"])
+                meta = elements(head)[0]
+                self.assertEqual(meta.classes, ["paper-meta"])
+                self.assertEqual(elements(meta)[0].classes, ["venue"])
+
+    def test_summary_spans_the_full_width_below_the_head(self):
+        for section, _, first in self.groups():
+            for li in find_all(section, "li", cls="paper"):
+                with self.subTest(arxiv=li.attrs.get("data-arxiv")):
+                    expected = [["paper-head"], ["tldr"], ["paper-links"]] if first else [["paper-head"], ["paper-links"]]
+                    self.assertEqual([n.classes for n in elements(li)], expected)
 
     def test_spotlights_are_award_badges(self):
         self.assertEqual([text(s) for s in find_all(self.doc, "span", cls="award")], ["Spotlight", "Spotlight"])
@@ -260,7 +269,7 @@ class TestPublications(unittest.TestCase):
             arxiv = li.attrs["data-arxiv"]
             src, href = THUMBNAILS[arxiv]
             with self.subTest(arxiv=arxiv):
-                link = elements(li)[1]
+                link = elements(elements(li)[0])[1]
                 self.assertEqual((link.tag, link.classes, link.attrs.get("href")), ("a", ["thumb"], href))
                 self.assertEqual((link.attrs.get("tabindex"), link.attrs.get("aria-hidden")), ("-1", "true"))
                 img = find(link, "img")
@@ -343,7 +352,7 @@ class TestStyle(unittest.TestCase):
         self.assertRegex(self.css, r"\.links svg\s*\{[^}]*fill:\s*currentColor")
 
     def test_thumbnails_are_centred_beside_their_paper(self):
-        self.assertRegex(self.css, r"\.paper\s*\{[^}]*align-items:\s*center")
+        self.assertRegex(self.css, r"\.paper-head\s*\{[^}]*align-items:\s*center")
 
     def test_thumbnails_show_the_whole_figure_and_lead_on_phones(self):
         self.assertRegex(self.css, r"\.thumb\s*\{[^}]*aspect-ratio:\s*2\s*/\s*1")

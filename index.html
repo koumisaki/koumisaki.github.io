@@ -66,63 +66,73 @@
 </dl>
 </header>
 
-<section id="research" aria-labelledby="research-heading">
-<h2 id="research-heading">Research</h2>
+<section id="selected-publications" aria-labelledby="selected-heading">
+<h2 id="selected-heading">Selected Publications</h2>
 <ol class="papers" role="list">
 <li class="paper" data-arxiv="2602.04344">
-<div class="paper-body">
+<div class="paper-head">
+<div class="paper-meta">
 <p class="venue"><span class="badge">ICML 2026</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2602.04344">UnMaskFork: Test-Time Scaling for Masked Diffusion via Deterministic Action Branching</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>diffusion language models</li><li>MCTS</li></ul>
-<p class="tldr">We propose an inference-time scaling method for masked diffusion language models in which multiple models collaborate during unmasking, with Monte Carlo tree search choosing among their deterministic unmasking steps. It outperforms existing inference-time scaling methods on coding benchmarks and scales well on math reasoning.</p>
-<p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> <a href="https://pub.sakana.ai/umf/">Blog</a></p>
 </div>
 <a class="thumb" href="https://pub.sakana.ai/umf/" tabindex="-1" aria-hidden="true"><img src="/images/papers/unmaskfork.webp" width="720" height="280" alt="" loading="lazy" decoding="async"></a>
+</div>
+<p class="tldr">We propose an inference-time scaling method for masked diffusion language models in which multiple models collaborate during unmasking, with Monte Carlo tree search choosing among their deterministic unmasking steps. It outperforms existing inference-time scaling methods on coding benchmarks and scales well on math reasoning.</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> <a href="https://pub.sakana.ai/umf/">Blog</a></p>
 </li>
 <li class="paper" data-arxiv="2510.21150">
-<div class="paper-body">
+<div class="paper-head">
+<div class="paper-meta">
 <p class="venue"><span class="badge">ICLR 2026</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2510.21150">String Seed of Thought: Prompting LLMs for Distribution-Faithful and Diverse Generation</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>prompting</li><li>output diversity</li><li>probabilistic instruction following</li></ul>
-<p class="tldr">LLMs often fail to make choices according to given probabilities: asked to flip a fair coin, they don't return heads and tails equally often. We show that prompting alone largely fixes this. Asking the model to first write a random string and then derive its answer from it brings its choices close to the target probabilities and makes open-ended answers more diverse.</p>
-<p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> <a href="https://pub.sakana.ai/ssot/">Blog</a></p>
 </div>
 <a class="thumb" href="https://pub.sakana.ai/ssot/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ssot.webp" width="720" height="378" alt="" loading="lazy" decoding="async"></a>
+</div>
+<p class="tldr">LLMs often fail to make choices according to given probabilities: asked to flip a fair coin, they don't return heads and tails equally often. We show that prompting alone largely fixes this. Asking the model to first write a random string and then derive its answer from it brings its choices close to the target probabilities and makes open-ended answers more diverse.</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> <a href="https://pub.sakana.ai/ssot/">Blog</a></p>
 </li>
 <li class="paper" data-arxiv="2503.04412">
-<div class="paper-body">
+<div class="paper-head">
+<div class="paper-meta">
 <p class="venue"><span class="badge">NeurIPS 2025</span> <span class="badge award">Spotlight</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2503.04412">Wider or Deeper? Scaling LLM Inference-Time Compute with Adaptive Branching Tree Search</a>
 <p class="authors">Yuichi Inoue*, <strong>Kou Misaki</strong>*, Yuki Imajuku, So Kuroki, Taishi Nakamura, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>MCTS</li><li>Bayesian modeling</li></ul>
+</div>
+<a class="thumb" href="https://sakana.ai/ab-mcts/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ab-mcts-schematic.webp" width="720" height="411" alt="" loading="lazy" decoding="async"></a>
+</div>
 <p class="tldr">We propose AB-MCTS, an inference-time scaling method for LLMs that extends Monte Carlo tree search: using Bayesian modeling of feedback, it decides at each step whether to sample a new answer or refine an existing one. Across a range of coding and engineering tasks, it consistently outperforms repeated sampling and standard MCTS. As part of this work, I developed TreeQuest, the accompanying open-source library.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2503.04412">arXiv</a> <a href="https://github.com/SakanaAI/treequest">TreeQuest</a> <a href="https://sakana.ai/ab-mcts/">Blog</a></p>
-</div>
-<a class="thumb" href="https://sakana.ai/ab-mcts/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ab-mcts.webp" width="720" height="369" alt="" loading="lazy" decoding="async"></a>
 </li>
 </ol>
 </section>
 
-<section id="other-papers" aria-labelledby="other-papers-heading">
-<h2 id="other-papers-heading">Other papers</h2>
+<section id="other-publications" aria-labelledby="other-heading">
+<h2 id="other-heading">Other Publications</h2>
 <ol class="papers" role="list">
 <li class="paper" data-arxiv="2509.21862">
-<div class="paper-body">
+<div class="paper-head">
+<div class="paper-meta">
 <p class="venue"><span class="badge">ALIFE 2026</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2509.21862">Shachi: A Modular, Controllable Framework for LLM-Based Agent-Based Modeling of Emergent Collective Behavior</a>
 <p class="authors">So Kuroki, Yingtao Tian, <strong>Kou Misaki</strong>, Takashi Ikegami, Takuya Akiba, Yujin Tang</p>
-<p class="paper-links"><a href="https://arxiv.org/abs/2509.21862">arXiv</a> <a href="https://github.com/SakanaAI/shachi">Code</a></p>
 </div>
+</div>
+<p class="paper-links"><a href="https://arxiv.org/abs/2509.21862">arXiv</a> <a href="https://github.com/SakanaAI/shachi">Code</a></p>
 </li>
 <li class="paper" data-arxiv="2501.16937">
-<div class="paper-body">
+<div class="paper-head">
+<div class="paper-meta">
 <p class="venue"><span class="badge">ICLR 2025</span> <span class="badge award">Spotlight</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2501.16937">TAID: Temporally Adaptive Interpolated Distillation for Efficient Knowledge Transfer in Language Models</a>
 <p class="authors">Makoto Shing, <strong>Kou Misaki</strong>, Han Bao, Sho Yokoi, Takuya Akiba</p>
-<p class="paper-links"><a href="https://arxiv.org/abs/2501.16937">arXiv</a> <a href="https://github.com/SakanaAI/TAID">Code</a> <a href="https://sakana.ai/taid/">Blog</a></p>
 </div>
+</div>
+<p class="paper-links"><a href="https://arxiv.org/abs/2501.16937">arXiv</a> <a href="https://github.com/SakanaAI/TAID">Code</a> <a href="https://sakana.ai/taid/">Blog</a></p>
 </li>
 </ol>
 <p class="legend">* Equal contribution. Full list on <a href="https://scholar.google.com/citations?user=8kL-3m4AAAAJ">Google Scholar</a>.</p>
