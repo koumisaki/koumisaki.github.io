@@ -110,6 +110,7 @@ section p { margin: 0; }
 .paper-title { font-family: var(--font-serif); font-size: 19px; font-weight: 500; line-height: 1.35; color: var(--text); overflow-wrap: anywhere; }
 .authors { color: var(--text-secondary); font-size: 14.5px; }
 .authors strong { color: var(--text); font-weight: 600; }
+.paper .author-note { margin-top: 0; color: var(--text-secondary); font-size: 13px; }
 .keywords { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .keywords li { font-size: 12.5px; line-height: 1.6; padding: 0 8px; border-radius: 4px; background: var(--tag-bg); color: var(--text-secondary); }
 .tldr { font-size: 15px; line-height: 1.6; }

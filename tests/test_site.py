@@ -321,12 +321,15 @@ class TestPublications(unittest.TestCase):
                 with self.subTest(arxiv=arxiv, phrase=phrase):
                     self.assertIn(phrase, tldr)
 
-    def test_equal_contribution(self):
-        authors = text(find(self.paper("2503.04412"), "p", cls="authors"))
-        self.assertIn("Yuichi Inoue*", authors)
-        self.assertIn("Kou Misaki*", authors)
-        legend = text(find(self.other, "p", cls="legend"))
-        self.assertIn("* Equal contribution", legend)
+    def test_equal_contribution_is_explained_right_under_the_authors(self):
+        authors = find(self.paper("2503.04412"), "p", cls="authors")
+        self.assertIn("Yuichi Inoue*", text(authors))
+        self.assertIn("Kou Misaki*", text(authors))
+        siblings = elements(authors.parent)
+        note = siblings[siblings.index(authors) + 1]
+        self.assertEqual((note.tag, note.classes, text(note)), ("p", ["author-note"], "* Equal contribution"))
+        self.assertEqual(text(find(self.other, "p", cls="legend")), "Full list on Google Scholar.")
+        self.assertIn(".author-note", (ROOT / "style.css").read_text(encoding="utf-8"))
 
     def test_scholar_full_list_link(self):
         legend = find(self.other, "p", cls="legend")
