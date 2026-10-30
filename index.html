@@ -47,7 +47,6 @@
 <main>
 <header class="profile">
 <div class="intro">
-<img class="portrait" src="/images/portrait.jpg" width="112" height="112" alt="Portrait of Kou Misaki">
 <div class="intro-text">
 <h1>Kou Misaki</h1>
 <p class="role">Machine learning researcher at Sakana AI, Tokyo</p>
@@ -59,6 +58,7 @@
 <li><a href="https://www.linkedin.com/in/kou-misaki/" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a></li>
 </ul>
 </div>
+<img class="portrait" src="/images/portrait.jpg" width="112" height="112" alt="Portrait of Kou Misaki">
 </div>
 <p class="lead">I work on inference-time scaling: getting better answers from large language models by spending more compute at test time.</p>
 <dl class="facts">
@@ -68,41 +68,63 @@
 </dl>
 </header>
 
-<section id="publications" aria-labelledby="publications-heading">
-<h2 id="publications-heading">Publications</h2>
+<section id="research" aria-labelledby="research-heading">
+<h2 id="research-heading">Research</h2>
 <ol class="papers" role="list">
-<li class="paper first-author" data-arxiv="2602.04344">
+<li class="paper" data-arxiv="2602.04344">
+<div class="paper-body">
 <p class="venue"><span class="badge">ICML 2026</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2602.04344">UnMaskFork: Test-Time Scaling for Masked Diffusion via Deterministic Action Branching</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
+<ul class="keywords" role="list"><li>inference-time scaling</li><li>diffusion language models</li><li>MCTS</li></ul>
 <p class="tldr">Treats unmasking in diffusion language models as a search tree; deterministic branching with Monte Carlo tree search beats existing test-time scaling baselines on coding and scales well on math.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> <a href="https://pub.sakana.ai/umf/">Blog</a></p>
+</div>
+<a class="thumb" href="https://pub.sakana.ai/umf/" tabindex="-1" aria-hidden="true"><img src="/images/papers/unmaskfork.webp" width="720" height="280" alt="" loading="lazy" decoding="async"></a>
 </li>
-<li class="paper first-author" data-arxiv="2510.21150">
+<li class="paper" data-arxiv="2510.21150">
+<div class="paper-body">
 <p class="venue"><span class="badge">ICLR 2026</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2510.21150">String Seed of Thought: Prompting LLMs for Distribution-Faithful and Diverse Generation</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
+<ul class="keywords" role="list"><li>prompting</li><li>output diversity</li><li>probabilistic instruction following</li></ul>
 <p class="tldr">Asking an LLM to first write a random string and derive its answer from it brings its sampling close to a pseudo-random number generator and makes open-ended responses more diverse.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> <a href="https://pub.sakana.ai/ssot/">Blog</a></p>
+</div>
+<a class="thumb" href="https://pub.sakana.ai/ssot/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ssot.webp" width="720" height="378" alt="" loading="lazy" decoding="async"></a>
 </li>
+<li class="paper" data-arxiv="2503.04412">
+<div class="paper-body">
+<p class="venue"><span class="badge">NeurIPS 2025</span> <span class="badge award">Spotlight</span></p>
+<a class="paper-title" href="https://arxiv.org/abs/2503.04412">Wider or Deeper? Scaling LLM Inference-Time Compute with Adaptive Branching Tree Search</a>
+<p class="authors">Yuichi Inoue*, <strong>Kou Misaki</strong>*, Yuki Imajuku, So Kuroki, Taishi Nakamura, Takuya Akiba</p>
+<ul class="keywords" role="list"><li>inference-time scaling</li><li>MCTS</li><li>Bayesian modeling</li></ul>
+<p class="tldr">Introduces AB-MCTS, a tree search that uses feedback to decide whether to sample new answers or refine existing ones, outperforming repeated sampling and standard MCTS on coding and engineering tasks with frontier models. I also developed TreeQuest, its open-source library.</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2503.04412">arXiv</a> <a href="https://github.com/SakanaAI/treequest">TreeQuest</a> <a href="https://sakana.ai/ab-mcts/">Blog</a></p>
+</div>
+<a class="thumb" href="https://sakana.ai/ab-mcts/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ab-mcts.webp" width="720" height="369" alt="" loading="lazy" decoding="async"></a>
+</li>
+</ol>
+</section>
+
+<section id="other-papers" aria-labelledby="other-papers-heading">
+<h2 id="other-papers-heading">Other papers</h2>
+<ol class="papers" role="list">
 <li class="paper" data-arxiv="2509.21862">
+<div class="paper-body">
 <p class="venue"><span class="badge">ALIFE 2026</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2509.21862">Shachi: A Modular, Controllable Framework for LLM-Based Agent-Based Modeling of Emergent Collective Behavior</a>
 <p class="authors">So Kuroki, Yingtao Tian, <strong>Kou Misaki</strong>, Takashi Ikegami, Takuya Akiba, Yujin Tang</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2509.21862">arXiv</a> <a href="https://github.com/SakanaAI/shachi">Code</a></p>
-</li>
-<li class="paper first-author" data-arxiv="2503.04412">
-<p class="venue"><span class="badge">NeurIPS 2025</span> <span class="badge award">Spotlight</span></p>
-<a class="paper-title" href="https://arxiv.org/abs/2503.04412">Wider or Deeper? Scaling LLM Inference-Time Compute with Adaptive Branching Tree Search</a>
-<p class="authors">Yuichi Inoue*, <strong>Kou Misaki</strong>*, Yuki Imajuku, So Kuroki, Taishi Nakamura, Takuya Akiba</p>
-<p class="tldr">Introduces AB-MCTS, a tree search that uses feedback to decide whether to sample new answers or refine existing ones, outperforming repeated sampling and standard MCTS on coding and engineering tasks with frontier models. I also developed TreeQuest, its open-source library.</p>
-<p class="paper-links"><a href="https://arxiv.org/abs/2503.04412">arXiv</a> <a href="https://github.com/SakanaAI/treequest">TreeQuest</a> <a href="https://sakana.ai/ab-mcts/">Blog</a></p>
+</div>
 </li>
 <li class="paper" data-arxiv="2501.16937">
+<div class="paper-body">
 <p class="venue"><span class="badge">ICLR 2025</span> <span class="badge award">Spotlight</span></p>
 <a class="paper-title" href="https://arxiv.org/abs/2501.16937">TAID: Temporally Adaptive Interpolated Distillation for Efficient Knowledge Transfer in Language Models</a>
 <p class="authors">Makoto Shing, <strong>Kou Misaki</strong>, Han Bao, Sho Yokoi, Takuya Akiba</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2501.16937">arXiv</a> <a href="https://github.com/SakanaAI/TAID">Code</a> <a href="https://sakana.ai/taid/">Blog</a></p>
+</div>
 </li>
 </ol>
 <p class="legend">* Equal contribution. Full list on <a href="https://scholar.google.com/citations?user=8kL-3m4AAAAJ">Google Scholar</a>.</p>

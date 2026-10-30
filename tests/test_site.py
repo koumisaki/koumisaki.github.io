@@ -48,15 +48,30 @@ def contrast(a, b):
     return (hi + 0.05) / (lo + 0.05)
 
 
-PAPERS = [
-    ("2602.04344", True, ["ICML 2026"], [("Blog", "https://pub.sakana.ai/umf/")]),
-    ("2510.21150", True, ["ICLR 2026"], [("Blog", "https://pub.sakana.ai/ssot/")]),
-    ("2509.21862", False, ["ALIFE 2026"], [("Code", "https://github.com/SakanaAI/shachi")]),
-    ("2503.04412", True, ["NeurIPS 2025", "Spotlight"],
+FIRST_AUTHOR = [
+    ("2602.04344", ["ICML 2026"], [("Blog", "https://pub.sakana.ai/umf/")]),
+    ("2510.21150", ["ICLR 2026"], [("Blog", "https://pub.sakana.ai/ssot/")]),
+    ("2503.04412", ["NeurIPS 2025", "Spotlight"],
      [("TreeQuest", "https://github.com/SakanaAI/treequest"), ("Blog", "https://sakana.ai/ab-mcts/")]),
-    ("2501.16937", False, ["ICLR 2025", "Spotlight"],
+]
+
+OTHER = [
+    ("2509.21862", ["ALIFE 2026"], [("Code", "https://github.com/SakanaAI/shachi")]),
+    ("2501.16937", ["ICLR 2025", "Spotlight"],
      [("Code", "https://github.com/SakanaAI/TAID"), ("Blog", "https://sakana.ai/taid/")]),
 ]
+
+KEYWORDS = {
+    "2602.04344": ["inference-time scaling", "diffusion language models", "MCTS"],
+    "2510.21150": ["prompting", "output diversity", "probabilistic instruction following"],
+    "2503.04412": ["inference-time scaling", "MCTS", "Bayesian modeling"],
+}
+
+THUMBNAILS = {
+    "2602.04344": ("/images/papers/unmaskfork.webp", "https://pub.sakana.ai/umf/"),
+    "2510.21150": ("/images/papers/ssot.webp", "https://pub.sakana.ai/ssot/"),
+    "2503.04412": ("/images/papers/ab-mcts.webp", "https://sakana.ai/ab-mcts/"),
+}
 
 LINKS = [
     ("Email", "#"),
@@ -99,8 +114,8 @@ class TestProfile(unittest.TestCase):
         self.profile = find(self.doc, "header", cls="profile")
         self.intro = find(self.profile, "div", cls="intro")
 
-    def test_photo_sits_left_of_name(self):
-        photo, beside = elements(self.intro)
+    def test_photo_sits_right_of_name(self):
+        beside, photo = elements(self.intro)
         self.assertEqual((photo.tag, photo.classes), ("img", ["portrait"]))
         self.assertIsNotNone(find(beside, "h1"))
 
@@ -131,9 +146,8 @@ class TestProfile(unittest.TestCase):
         for venue in ["ICML\xa02026", "ICLR\xa02026", "NeurIPS\xa02025\xa0(Spotlight)"]:
             self.assertIn(venue, raw)
 
-    def test_no_bio_paragraph_or_research_section(self):
+    def test_no_bio_paragraph(self):
         self.assertIsNone(find(self.doc, "p", cls="bio"))
-        self.assertIsNone(find(self.doc, "section", attr=("id", "research")))
 
     def test_icon_links(self):
         links = find(self.intro, "ul", cls="links")
@@ -181,50 +195,94 @@ class TestProfile(unittest.TestCase):
 
 class TestPublications(unittest.TestCase):
     def setUp(self):
-        self.section = find(parse("index.html"), "section", attr=("id", "publications"))
-        self.papers = find_all(self.section, "li", cls="paper")
+        self.doc = parse("index.html")
+        self.first = find(self.doc, "section", attr=("id", "research"))
+        self.other = find(self.doc, "section", attr=("id", "other-papers"))
+        self.papers = find_all(self.doc, "li", cls="paper")
+
+    def paper(self, arxiv):
+        return find(self.doc, "li", attr=("data-arxiv", arxiv))
+
+    def groups(self):
+        return [(self.first, FIRST_AUTHOR, True), (self.other, OTHER, False)]
+
+    def test_own_papers_come_before_the_rest(self):
+        self.assertEqual([s.attrs.get("id") for s in find_all(self.doc, "section")], ["research", "other-papers"])
+        self.assertEqual(text(find(self.first, "h2")), "Research")
+        self.assertEqual(text(find(self.other, "h2")), "Other papers")
 
     def test_order(self):
-        self.assertEqual([p.attrs.get("data-arxiv") for p in self.papers], [p[0] for p in PAPERS])
+        for section, papers, _ in self.groups():
+            with self.subTest(section=section.attrs.get("id")):
+                found = [li.attrs.get("data-arxiv") for li in find_all(section, "li", cls="paper")]
+                self.assertEqual(found, [p[0] for p in papers])
 
-    def test_list_keeps_its_semantics(self):
-        self.assertEqual(find(self.section, "ol", cls="papers").attrs.get("role"), "list")
+    def test_lists_keep_their_semantics(self):
+        for section, _, _ in self.groups():
+            self.assertEqual(find(section, "ol", cls="papers").attrs.get("role"), "list")
 
     def test_each_paper(self):
-        for li, (arxiv, first, badges, links) in zip(self.papers, PAPERS):
-            with self.subTest(arxiv=arxiv):
-                abs_url = f"https://arxiv.org/abs/{arxiv}"
-                self.assertEqual(find(li, "a", cls="paper-title").attrs.get("href"), abs_url)
-                self.assertEqual([text(s) for s in find_all(find(li, "p", cls="authors"), "strong")], ["Kou Misaki"])
-                self.assertEqual([text(s) for s in find_all(find(li, "p", cls="venue"), "span", cls="badge")], badges)
-                self.assertEqual("first-author" in li.classes, first)
-                tldr = find(li, "p", cls="tldr")
-                self.assertEqual(tldr is not None and bool(text(tldr)), first)
-                found = [(text(a), a.attrs.get("href")) for a in find_all(find(li, "p", cls="paper-links"), "a")]
-                self.assertEqual(found, [("arXiv", abs_url)] + links)
+        for section, papers, first in self.groups():
+            for li, (arxiv, badges, links) in zip(find_all(section, "li", cls="paper"), papers):
+                with self.subTest(arxiv=arxiv):
+                    abs_url = f"https://arxiv.org/abs/{arxiv}"
+                    self.assertEqual(find(li, "a", cls="paper-title").attrs.get("href"), abs_url)
+                    self.assertEqual([text(s) for s in find_all(find(li, "p", cls="authors"), "strong")], ["Kou Misaki"])
+                    self.assertEqual([text(s) for s in find_all(find(li, "p", cls="venue"), "span", cls="badge")], badges)
+                    tldr = find(li, "p", cls="tldr")
+                    self.assertEqual(tldr is not None and bool(text(tldr)), first)
+                    found = [(text(a), a.attrs.get("href")) for a in find_all(find(li, "p", cls="paper-links"), "a")]
+                    self.assertEqual(found, [("arXiv", abs_url)] + links)
 
     def test_venue_badge_comes_first(self):
         for li in self.papers:
             with self.subTest(arxiv=li.attrs.get("data-arxiv")):
-                self.assertEqual(elements(li)[0].classes, ["venue"])
+                body = elements(li)[0]
+                self.assertEqual(body.classes, ["paper-body"])
+                self.assertEqual(elements(body)[0].classes, ["venue"])
 
     def test_spotlights_are_award_badges(self):
-        self.assertEqual([text(s) for s in find_all(self.section, "span", cls="award")], ["Spotlight", "Spotlight"])
+        self.assertEqual([text(s) for s in find_all(self.doc, "span", cls="award")], ["Spotlight", "Spotlight"])
+
+    def test_research_papers_have_keywords(self):
+        for li in find_all(self.first, "li", cls="paper"):
+            arxiv = li.attrs["data-arxiv"]
+            with self.subTest(arxiv=arxiv):
+                keywords = find(li, "ul", cls="keywords")
+                self.assertEqual(keywords.attrs.get("role"), "list")
+                self.assertEqual([text(k) for k in find_all(keywords, "li")], KEYWORDS[arxiv])
+        self.assertIsNone(find(self.other, "ul", cls="keywords"))
+
+    def test_research_papers_show_their_blog_figure(self):
+        for li in find_all(self.first, "li", cls="paper"):
+            arxiv = li.attrs["data-arxiv"]
+            src, href = THUMBNAILS[arxiv]
+            with self.subTest(arxiv=arxiv):
+                link = elements(li)[1]
+                self.assertEqual((link.tag, link.classes, link.attrs.get("href")), ("a", ["thumb"], href))
+                self.assertEqual((link.attrs.get("tabindex"), link.attrs.get("aria-hidden")), ("-1", "true"))
+                img = find(link, "img")
+                self.assertEqual((img.attrs.get("src"), img.attrs.get("loading")), (src, "lazy"))
+                self.assertTrue(img.attrs.get("width") and img.attrs.get("height"))
+                path = ROOT / src.lstrip("/")
+                self.assertTrue(path.exists(), path)
+                self.assertLess(path.stat().st_size, 80_000)
+        self.assertIsNone(find(self.other, "a", cls="thumb"))
 
     def test_ab_mcts_named_and_treequest_credited(self):
-        tldr = text(find(self.papers[3], "p", cls="tldr"))
+        tldr = text(find(self.paper("2503.04412"), "p", cls="tldr"))
         self.assertIn("Introduces AB-MCTS", tldr)
         self.assertIn("I also developed TreeQuest", tldr)
 
     def test_equal_contribution(self):
-        authors = text(find(self.papers[3], "p", cls="authors"))
+        authors = text(find(self.paper("2503.04412"), "p", cls="authors"))
         self.assertIn("Yuichi Inoue*", authors)
         self.assertIn("Kou Misaki*", authors)
-        legend = text(find(self.section, "p", cls="legend"))
+        legend = text(find(self.other, "p", cls="legend"))
         self.assertIn("* Equal contribution", legend)
 
     def test_scholar_full_list_link(self):
-        legend = find(self.section, "p", cls="legend")
+        legend = find(self.other, "p", cls="legend")
         self.assertIn("https://scholar.google.com/citations?user=8kL-3m4AAAAJ",
                       [a.attrs.get("href") for a in find_all(legend, "a")])
 
@@ -240,7 +298,7 @@ class TestStyle(unittest.TestCase):
         light = css_tokens(self.css, ":root {")
         dark = css_tokens(self.css, "@media (prefers-color-scheme: dark)")
         pairs = [("--text", "--bg"), ("--text-secondary", "--bg"), ("--accent", "--bg"),
-                 ("--badge-text", "--badge-bg"), ("--award-text", "--award-bg")]
+                 ("--badge-text", "--badge-bg"), ("--award-text", "--award-bg"), ("--text-secondary", "--tag-bg")]
         for name, tokens in [("light", light), ("dark", dark)]:
             for fg, bg in pairs:
                 with self.subTest(mode=name, pair=(fg, bg)):
@@ -251,13 +309,14 @@ class TestStyle(unittest.TestCase):
         self.assertRegex(self.css, r"--font-sans:[^;]*Inter[^;]*,\s*sans-serif;")
 
     def test_layout_width(self):
-        self.assertIn("max-width: 720px", self.css)
+        self.assertIn("max-width: 760px", self.css)
 
     def test_long_titles_wrap(self):
         self.assertRegex(self.css, r"\.paper-title\s*\{[^}]*overflow-wrap:\s*anywhere")
 
-    def test_photo_and_name_are_centred_beside_each_other(self):
+    def test_name_fills_the_row_and_photo_is_centred_beside_it(self):
         self.assertRegex(self.css, r"\.intro\s*\{[^}]*align-items:\s*center")
+        self.assertRegex(self.css, r"\.intro-text\s*\{[^}]*flex:\s*1")
         self.assertRegex(self.css, r"\.portrait\s*\{[^}]*width:\s*112px")
 
     def test_mobile_keeps_photo_beside_name(self):
@@ -271,6 +330,13 @@ class TestStyle(unittest.TestCase):
 
     def test_icons_follow_text_colour(self):
         self.assertRegex(self.css, r"\.links svg\s*\{[^}]*fill:\s*currentColor")
+
+    def test_thumbnails_show_the_whole_figure_and_lead_on_phones(self):
+        self.assertRegex(self.css, r"\.thumb\s*\{[^}]*aspect-ratio:\s*2\s*/\s*1")
+        self.assertRegex(self.css, r"\.thumb img\s*\{[^}]*object-fit:\s*contain")
+        self.assertRegex(self.css, r"\.thumb img\s*\{[^}]*position:\s*absolute")
+        mobile = self.css[self.css.index("@media (max-width: 600px)"):]
+        self.assertRegex(mobile, r"\.thumb\s*\{[^}]*order:\s*-1")
 
     def test_links_in_running_text_are_underlined(self):
         self.assertRegex(self.css, r"\.legend a\s*\{[^}]*text-decoration:\s*underline")
