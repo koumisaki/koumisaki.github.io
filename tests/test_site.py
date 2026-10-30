@@ -29,6 +29,10 @@ def text_of_scripts(doc):
     return ["".join(c for c in s.children if isinstance(c, str)) for s in find_all(doc, "script")]
 
 
+def elements(node):
+    return [c for c in node.children if not isinstance(c, str)]
+
+
 def css_tokens(css, block_start):
     start = css.index(block_start)
     block = css[start:css.index("}", start)]
@@ -45,11 +49,21 @@ def contrast(a, b):
 
 
 PAPERS = [
-    ("2602.04344", True, "ICML 2026", [], ["https://pub.sakana.ai/umf/"]),
-    ("2510.21150", True, "ICLR 2026", [], ["https://pub.sakana.ai/ssot/"]),
-    ("2509.21862", False, "ALIFE 2026", ["https://github.com/SakanaAI/shachi"], []),
-    ("2503.04412", True, "NeurIPS 2025 · Spotlight", ["https://github.com/SakanaAI/treequest"], ["https://sakana.ai/ab-mcts/"]),
-    ("2501.16937", False, "ICLR 2025 · Spotlight", ["https://github.com/SakanaAI/TAID"], ["https://sakana.ai/taid/"]),
+    ("2602.04344", True, ["ICML 2026"], [("Blog", "https://pub.sakana.ai/umf/")]),
+    ("2510.21150", True, ["ICLR 2026"], [("Blog", "https://pub.sakana.ai/ssot/")]),
+    ("2509.21862", False, ["ALIFE 2026"], [("Code", "https://github.com/SakanaAI/shachi")]),
+    ("2503.04412", True, ["NeurIPS 2025", "Spotlight"],
+     [("TreeQuest", "https://github.com/SakanaAI/treequest"), ("Blog", "https://sakana.ai/ab-mcts/")]),
+    ("2501.16937", False, ["ICLR 2025", "Spotlight"],
+     [("Code", "https://github.com/SakanaAI/TAID"), ("Blog", "https://sakana.ai/taid/")]),
+]
+
+LINKS = [
+    ("Email", "#"),
+    ("Google Scholar", "https://scholar.google.com/citations?user=8kL-3m4AAAAJ"),
+    ("GitHub", "https://github.com/takkyu2"),
+    ("X", "https://x.com/takkyuO2"),
+    ("LinkedIn", "https://www.linkedin.com/in/kou-misaki/"),
 ]
 
 
@@ -79,44 +93,72 @@ class TestSkeleton(unittest.TestCase):
         self.assertTrue((ROOT / ".nojekyll").exists())
 
 
-class TestIntro(unittest.TestCase):
+class TestProfile(unittest.TestCase):
     def setUp(self):
         self.doc = parse("index.html")
-        self.intro = find(self.doc, "header", cls="intro")
+        self.profile = find(self.doc, "header", cls="profile")
+        self.intro = find(self.profile, "div", cls="intro")
 
-    def test_tagline(self):
-        self.assertEqual(text(find(self.intro, "p", cls="tagline")),
-                         "Machine learning researcher · inference-time scaling for LLMs")
+    def test_photo_sits_left_of_name(self):
+        photo, beside = elements(self.intro)
+        self.assertEqual((photo.tag, photo.classes), ("img", ["portrait"]))
+        self.assertIsNotNone(find(beside, "h1"))
 
-    def test_bio_covers_career(self):
-        bio = text(find(self.intro, "p", cls="bio"))
-        for phrase in ["I'm a Research Engineer at Sakana AI", "UnMaskFork (ICML 2026)",
-                       "String Seed of Thought (ICLR 2026)", "AB-MCTS (NeurIPS 2025 Spotlight)",
-                       "TAID (ICLR 2025 Spotlight)", "Japanese Siri at Apple", "Recruit",
-                       "theoretical condensed-matter physics from the University of Tokyo"]:
-            self.assertIn(phrase, bio)
+    def test_only_name_role_and_links_beside_photo(self):
+        beside = find(self.intro, "div", cls="intro-text")
+        self.assertEqual([(n.tag, n.classes) for n in elements(beside)],
+                         [("h1", []), ("p", ["role"]), ("ul", ["links"])])
 
-    def test_profile_links(self):
-        hrefs = [a.attrs.get("href") for a in find_all(find(self.intro, "ul", cls="links"), "a")]
-        for url in ["https://scholar.google.com/citations?user=8kL-3m4AAAAJ",
-                    "https://github.com/takkyu2", "https://x.com/takkyuO2",
-                    "https://www.linkedin.com/in/kou-misaki/"]:
-            self.assertIn(url, hrefs)
+    def test_role(self):
+        self.assertEqual(text(find(self.intro, "p", cls="role")), "Machine learning researcher at Sakana AI, Tokyo")
 
-    def test_email_is_assembled_by_script(self):
+    def test_lead_sentence(self):
+        self.assertEqual(text(find(self.profile, "p", cls="lead")),
+                         "I work on inference-time scaling: getting better answers from large language models "
+                         "by spending more compute at test time.")
+
+    def test_key_facts(self):
+        facts = find(self.profile, "dl", cls="facts")
+        self.assertEqual([text(n) for n in find_all(facts, "dt")], ["First-author papers", "Before Sakana AI", "PhD"])
+        self.assertEqual([text(n) for n in find_all(facts, "dd")],
+                         ["ICML 2026, ICLR 2026, NeurIPS 2025 (Spotlight)",
+                          "Apple (Japanese Siri), Recruit",
+                          "Theoretical Physics, The University of Tokyo"])
+
+    def test_venue_names_do_not_break_across_lines(self):
+        dd = find_all(find(self.profile, "dl", cls="facts"), "dd")[0]
+        raw = "".join(c for c in dd.children if isinstance(c, str))
+        for venue in ["ICML\xa02026", "ICLR\xa02026", "NeurIPS\xa02025\xa0(Spotlight)"]:
+            self.assertIn(venue, raw)
+
+    def test_no_bio_paragraph_or_research_section(self):
+        self.assertIsNone(find(self.doc, "p", cls="bio"))
+        self.assertIsNone(find(self.doc, "section", attr=("id", "research")))
+
+    def test_icon_links(self):
+        links = find(self.intro, "ul", cls="links")
+        self.assertEqual(links.attrs.get("role"), "list")
+        anchors = find_all(links, "a")
+        self.assertEqual([(a.attrs.get("aria-label"), a.attrs.get("href")) for a in anchors], LINKS)
+        for a in anchors:
+            with self.subTest(link=a.attrs.get("aria-label")):
+                self.assertEqual(a.attrs.get("title"), a.attrs.get("aria-label"))
+                self.assertEqual(text(a), "")
+                self.assertEqual(find(a, "svg").attrs.get("aria-hidden"), "true")
+
+    def test_email_icon_is_assembled_by_script(self):
         a = find(self.intro, "a", cls="email")
-        self.assertEqual(a.attrs.get("data-user"), "mk940se")
-        self.assertEqual(a.attrs.get("data-domain"), "gmail.com")
+        self.assertEqual((a.attrs.get("data-user"), a.attrs.get("data-domain")), ("mk940se", "gmail.com"))
         script = " ".join(text_of_scripts(self.doc))
         self.assertIn("mailto:", script)
         self.assertIn("data-user", script)
 
-    def test_email_address_shown_as_link_text(self):
-        script = " ".join(text_of_scripts(self.doc))
-        self.assertIn("textContent", script)
-
-    def test_email_noscript_fallback(self):
-        self.assertIn("mk940se [at] gmail.com", text(find(self.intro, "noscript")))
+    def test_footer_shows_email_address(self):
+        footer = find(self.doc, "footer", cls="footer")
+        a = find(footer, "a", cls="email-address")
+        self.assertEqual((a.attrs.get("data-user"), a.attrs.get("data-domain")), ("mk940se", "gmail.com"))
+        self.assertIn("mk940se [at] gmail.com", text(find(footer, "noscript")))
+        self.assertRegex(" ".join(text_of_scripts(self.doc)), r"email-address[\s\S]*textContent")
 
     def test_no_plaintext_email_anywhere(self):
         address = ("mk940se" + "@" + "gmail.com").encode()
@@ -126,7 +168,7 @@ class TestIntro(unittest.TestCase):
     def test_portrait_markup(self):
         img = find(self.intro, "img", cls="portrait")
         self.assertEqual(img.attrs.get("src"), "/images/portrait.jpg")
-        self.assertEqual((img.attrs.get("width"), img.attrs.get("height")), ("160", "160"))
+        self.assertEqual((img.attrs.get("width"), img.attrs.get("height")), ("112", "112"))
         self.assertTrue(img.attrs.get("alt"))
 
     def test_portrait_file_is_small_square_and_clean(self):
@@ -137,15 +179,6 @@ class TestIntro(unittest.TestCase):
         self.assertLess(path.stat().st_size, 60_000)
 
 
-class TestResearch(unittest.TestCase):
-    def test_research_paragraph(self):
-        section = find(parse("index.html"), "section", attr=("id", "research"))
-        self.assertEqual(text(find(section, "h2")), "Research")
-        body = text(find(section, "p"))
-        for phrase in ["inference-time compute", "search", "diverse", "reasoning"]:
-            self.assertIn(phrase, body)
-
-
 class TestPublications(unittest.TestCase):
     def setUp(self):
         self.section = find(parse("index.html"), "section", attr=("id", "publications"))
@@ -154,18 +187,34 @@ class TestPublications(unittest.TestCase):
     def test_order(self):
         self.assertEqual([p.attrs.get("data-arxiv") for p in self.papers], [p[0] for p in PAPERS])
 
+    def test_list_keeps_its_semantics(self):
+        self.assertEqual(find(self.section, "ol", cls="papers").attrs.get("role"), "list")
+
     def test_each_paper(self):
-        for li, (arxiv, first, venue, code, blog) in zip(self.papers, PAPERS):
+        for li, (arxiv, first, badges, links) in zip(self.papers, PAPERS):
             with self.subTest(arxiv=arxiv):
                 abs_url = f"https://arxiv.org/abs/{arxiv}"
                 self.assertEqual(find(li, "a", cls="paper-title").attrs.get("href"), abs_url)
                 self.assertEqual([text(s) for s in find_all(find(li, "p", cls="authors"), "strong")], ["Kou Misaki"])
-                self.assertEqual(text(find(li, "p", cls="venue")), venue)
+                self.assertEqual([text(s) for s in find_all(find(li, "p", cls="venue"), "span", cls="badge")], badges)
                 self.assertEqual("first-author" in li.classes, first)
                 tldr = find(li, "p", cls="tldr")
                 self.assertEqual(tldr is not None and bool(text(tldr)), first)
-                links = [a.attrs.get("href") for a in find_all(find(li, "p", cls="paper-links"), "a")]
-                self.assertEqual(links, [abs_url] + code + blog)
+                found = [(text(a), a.attrs.get("href")) for a in find_all(find(li, "p", cls="paper-links"), "a")]
+                self.assertEqual(found, [("arXiv", abs_url)] + links)
+
+    def test_venue_badge_comes_first(self):
+        for li in self.papers:
+            with self.subTest(arxiv=li.attrs.get("data-arxiv")):
+                self.assertEqual(elements(li)[0].classes, ["venue"])
+
+    def test_spotlights_are_award_badges(self):
+        self.assertEqual([text(s) for s in find_all(self.section, "span", cls="award")], ["Spotlight", "Spotlight"])
+
+    def test_ab_mcts_named_and_treequest_credited(self):
+        tldr = text(find(self.papers[3], "p", cls="tldr"))
+        self.assertIn("Introduces AB-MCTS", tldr)
+        self.assertIn("I also developed TreeQuest", tldr)
 
     def test_equal_contribution(self):
         authors = text(find(self.papers[3], "p", cls="authors"))
@@ -190,10 +239,12 @@ class TestStyle(unittest.TestCase):
     def test_contrast_ratios(self):
         light = css_tokens(self.css, ":root {")
         dark = css_tokens(self.css, "@media (prefers-color-scheme: dark)")
+        pairs = [("--text", "--bg"), ("--text-secondary", "--bg"), ("--accent", "--bg"),
+                 ("--badge-text", "--badge-bg"), ("--award-text", "--award-bg")]
         for name, tokens in [("light", light), ("dark", dark)]:
-            for key in ["--text", "--text-secondary", "--accent"]:
-                with self.subTest(mode=name, token=key):
-                    self.assertGreaterEqual(contrast(tokens[key], tokens["--bg"]), 4.5)
+            for fg, bg in pairs:
+                with self.subTest(mode=name, pair=(fg, bg)):
+                    self.assertGreaterEqual(contrast(tokens[fg], tokens[bg]), 4.5)
 
     def test_font_fallbacks(self):
         self.assertRegex(self.css, r"--font-serif:[^;]*Newsreader[^;]*,\s*serif;")
@@ -205,14 +256,37 @@ class TestStyle(unittest.TestCase):
     def test_long_titles_wrap(self):
         self.assertRegex(self.css, r"\.paper-title\s*\{[^}]*overflow-wrap:\s*anywhere")
 
-    def test_mobile_layout_puts_photo_on_top(self):
-        self.assertRegex(self.css, r"@media \(max-width: 600px\)[\s\S]*\.intro\s*\{[^}]*flex-direction:\s*column-reverse")
+    def test_photo_and_name_are_centred_beside_each_other(self):
+        self.assertRegex(self.css, r"\.intro\s*\{[^}]*align-items:\s*center")
+        self.assertRegex(self.css, r"\.portrait\s*\{[^}]*width:\s*112px")
+
+    def test_mobile_keeps_photo_beside_name(self):
+        self.assertNotIn("column-reverse", self.css)
+        mobile = self.css[self.css.index("@media (max-width: 600px)"):]
+        self.assertRegex(mobile, r"\.portrait\s*\{[^}]*width:\s*84px")
+
+    def test_icons_fit_on_small_phones(self):
+        small = self.css[self.css.index("@media (max-width: 360px)"):]
+        self.assertRegex(small, r"\.links a\s*\{[^}]*width:\s*36px")
+
+    def test_icons_follow_text_colour(self):
+        self.assertRegex(self.css, r"\.links svg\s*\{[^}]*fill:\s*currentColor")
+
+    def test_links_in_running_text_are_underlined(self):
+        self.assertRegex(self.css, r"\.legend a\s*\{[^}]*text-decoration:\s*underline")
+
+    def test_404_uses_only_defined_classes(self):
+        for node in find_all(parse("404.html"), attr=("class", None)):
+            for cls in node.classes:
+                with self.subTest(cls=cls):
+                    self.assertRegex(self.css, rf"\.{cls}\b")
 
     def test_fonts_loaded_and_footer(self):
         doc = parse("index.html")
         hrefs = [l.attrs.get("href", "") for l in find_all(doc, "link")]
         self.assertTrue(any("fonts.googleapis.com/css2" in h and "Newsreader" in h and "Inter" in h for h in hrefs))
-        self.assertEqual(text(find(doc, "footer", cls="footer")), "Last updated: October 2026")
+        footer = find(doc, "footer", cls="footer")
+        self.assertIn("Last updated: October 2026", [text(p) for p in find_all(footer, "p")])
 
 
 SAME_AS = [
