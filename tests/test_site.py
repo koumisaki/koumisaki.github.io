@@ -27,6 +27,15 @@ def text_of_scripts(doc):
     return ["".join(c for c in s.children if isinstance(c, str)) for s in find_all(doc, "script")]
 
 
+PAPERS = [
+    ("2602.04344", True, "ICML 2026", [], ["https://pub.sakana.ai/umf/"]),
+    ("2510.21150", True, "ICLR 2026", [], ["https://pub.sakana.ai/ssot/"]),
+    ("2509.21862", False, "ALIFE 2026", ["https://github.com/SakanaAI/shachi"], []),
+    ("2503.04412", True, "NeurIPS 2025 · Spotlight", ["https://github.com/SakanaAI/treequest"], ["https://sakana.ai/ab-mcts/"]),
+    ("2501.16937", False, "ICLR 2025 · Spotlight", ["https://github.com/SakanaAI/TAID"], ["https://sakana.ai/taid/"]),
+]
+
+
 class TestSkeleton(unittest.TestCase):
     def setUp(self):
         self.doc = parse("index.html")
@@ -105,6 +114,52 @@ class TestIntro(unittest.TestCase):
         self.assertEqual((width, height), (400, 400))
         self.assertFalse(has_exif)
         self.assertLess(path.stat().st_size, 60_000)
+
+
+class TestResearch(unittest.TestCase):
+    def test_research_paragraph(self):
+        section = find(parse("index.html"), "section", attr=("id", "research"))
+        self.assertEqual(text(find(section, "h2")), "Research")
+        body = text(find(section, "p"))
+        for phrase in ["inference-time compute", "search", "diverse", "reasoning"]:
+            self.assertIn(phrase, body)
+
+
+class TestPublications(unittest.TestCase):
+    def setUp(self):
+        self.section = find(parse("index.html"), "section", attr=("id", "publications"))
+        self.papers = find_all(self.section, "li", cls="paper")
+
+    def test_order(self):
+        self.assertEqual([p.attrs.get("data-arxiv") for p in self.papers], [p[0] for p in PAPERS])
+
+    def test_each_paper(self):
+        for li, (arxiv, first, venue, code, blog) in zip(self.papers, PAPERS):
+            with self.subTest(arxiv=arxiv):
+                abs_url = f"https://arxiv.org/abs/{arxiv}"
+                self.assertEqual(find(li, "a", cls="paper-title").attrs.get("href"), abs_url)
+                self.assertEqual([text(s) for s in find_all(find(li, "p", cls="authors"), "strong")], ["Kou Misaki"])
+                self.assertEqual(text(find(li, "p", cls="venue")), venue)
+                self.assertEqual("first-author" in li.classes, first)
+                tldr = find(li, "p", cls="tldr")
+                self.assertEqual(tldr is not None and bool(text(tldr)), first)
+                links = [a.attrs.get("href") for a in find_all(find(li, "p", cls="paper-links"), "a")]
+                self.assertEqual(links, [abs_url] + code + blog)
+
+    def test_equal_contribution(self):
+        authors = text(find(self.papers[3], "p", cls="authors"))
+        self.assertIn("Yuichi Inoue*", authors)
+        self.assertIn("Kou Misaki*", authors)
+        legend = text(find(self.section, "p", cls="legend"))
+        self.assertIn("* Equal contribution", legend)
+
+    def test_scholar_full_list_link(self):
+        legend = find(self.section, "p", cls="legend")
+        self.assertIn("https://scholar.google.com/citations?user=8kL-3m4AAAAJ",
+                      [a.attrs.get("href") for a in find_all(legend, "a")])
+
+    def test_no_openreview_links(self):
+        self.assertNotIn("openreview.net", (ROOT / "index.html").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

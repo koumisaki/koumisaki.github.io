@@ -24,6 +24,51 @@
 </div>
 <img class="portrait" src="/images/portrait.jpg" width="160" height="160" alt="Portrait of Kou Misaki">
 </header>
+
+<section id="research" aria-labelledby="research-heading">
+<h2 id="research-heading">Research</h2>
+<p>My research asks how language models can turn extra inference-time compute into better answers. I work on search over generation paths, from tree search with autoregressive models to unmasking strategies for diffusion language models; on sampling that stays diverse while remaining faithful to a target distribution; and on the reasoning and coding tasks where these methods pay off.</p>
+</section>
+
+<section id="publications" aria-labelledby="publications-heading">
+<h2 id="publications-heading">Publications</h2>
+<ol class="papers">
+<li class="paper first-author" data-arxiv="2602.04344">
+<a class="paper-title" href="https://arxiv.org/abs/2602.04344">UnMaskFork: Test-Time Scaling for Masked Diffusion via Deterministic Action Branching</a>
+<p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
+<p class="venue">ICML 2026</p>
+<p class="tldr">Treats unmasking in diffusion language models as a search tree; deterministic branching with Monte Carlo tree search beats existing test-time scaling baselines on coding and scales well on math.</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> · <a href="https://pub.sakana.ai/umf/">blog</a></p>
+</li>
+<li class="paper first-author" data-arxiv="2510.21150">
+<a class="paper-title" href="https://arxiv.org/abs/2510.21150">String Seed of Thought: Prompting LLMs for Distribution-Faithful and Diverse Generation</a>
+<p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
+<p class="venue">ICLR 2026</p>
+<p class="tldr">Asking an LLM to first write a random string and derive its answer from it brings its sampling close to a pseudo-random number generator and makes open-ended responses more diverse.</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> · <a href="https://pub.sakana.ai/ssot/">blog</a></p>
+</li>
+<li class="paper" data-arxiv="2509.21862">
+<a class="paper-title" href="https://arxiv.org/abs/2509.21862">Shachi: A Modular, Controllable Framework for LLM-Based Agent-Based Modeling of Emergent Collective Behavior</a>
+<p class="authors">So Kuroki, Yingtao Tian, <strong>Kou Misaki</strong>, Takashi Ikegami, Takuya Akiba, Yujin Tang</p>
+<p class="venue">ALIFE 2026</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2509.21862">arXiv</a> · <a href="https://github.com/SakanaAI/shachi">code</a></p>
+</li>
+<li class="paper first-author" data-arxiv="2503.04412">
+<a class="paper-title" href="https://arxiv.org/abs/2503.04412">Wider or Deeper? Scaling LLM Inference-Time Compute with Adaptive Branching Tree Search</a>
+<p class="authors">Yuichi Inoue*, <strong>Kou Misaki</strong>*, Yuki Imajuku, So Kuroki, Taishi Nakamura, Takuya Akiba</p>
+<p class="venue">NeurIPS 2025 · Spotlight</p>
+<p class="tldr">A tree search that adaptively chooses between sampling new answers and refining existing ones using feedback, outperforming repeated sampling and standard MCTS on coding and engineering tasks with frontier models.</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2503.04412">arXiv</a> · <a href="https://github.com/SakanaAI/treequest">code</a> · <a href="https://sakana.ai/ab-mcts/">blog</a></p>
+</li>
+<li class="paper" data-arxiv="2501.16937">
+<a class="paper-title" href="https://arxiv.org/abs/2501.16937">TAID: Temporally Adaptive Interpolated Distillation for Efficient Knowledge Transfer in Language Models</a>
+<p class="authors">Makoto Shing, <strong>Kou Misaki</strong>, Han Bao, Sho Yokoi, Takuya Akiba</p>
+<p class="venue">ICLR 2025 · Spotlight</p>
+<p class="paper-links"><a href="https://arxiv.org/abs/2501.16937">arXiv</a> · <a href="https://github.com/SakanaAI/TAID">code</a> · <a href="https://sakana.ai/taid/">blog</a></p>
+</li>
+</ol>
+<p class="legend">* Equal contribution. Full list on <a href="https://scholar.google.com/citations?user=8kL-3m4AAAAJ">Google Scholar</a>.</p>
+</section>
 </main>
 </div>
 <script>
