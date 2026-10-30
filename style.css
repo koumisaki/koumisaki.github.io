@@ -10,15 +10,16 @@
   --award-bg: #f6ead3;
   --award-text: #6b4a12;
   --tag-bg: #efece5;
+  --figure-brightness: 1;
   --font-serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color-scheme: light dark;
 }
 
-/* The theme toggle sets data-theme; without a choice the system setting decides. */
+/* The theme toggle sets data-theme; without a choice the system setting decides. Print always uses the light colours. */
 :root[data-theme="light"] { color-scheme: light; }
 
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #151513;
     --text: #ecebe6;
@@ -31,22 +32,26 @@
     --award-bg: #33291a;
     --award-text: #ecc98a;
     --tag-bg: #262522;
+    --figure-brightness: 0.88;
   }
 }
 
-:root[data-theme="dark"] {
-  --bg: #151513;
-  --text: #ecebe6;
-  --text-secondary: #a9a69e;
-  --accent: #8fb6de;
-  --border: #2e2d2a;
-  --hover: #232220;
-  --badge-bg: #1d2a38;
-  --badge-text: #b4cfeb;
-  --award-bg: #33291a;
-  --award-text: #ecc98a;
-  --tag-bg: #262522;
-  color-scheme: dark;
+@media screen {
+  :root[data-theme="dark"] {
+    --bg: #151513;
+    --text: #ecebe6;
+    --text-secondary: #a9a69e;
+    --accent: #8fb6de;
+    --border: #2e2d2a;
+    --hover: #232220;
+    --badge-bg: #1d2a38;
+    --badge-text: #b4cfeb;
+    --award-bg: #33291a;
+    --award-text: #ecc98a;
+    --tag-bg: #262522;
+    --figure-brightness: 0.88;
+    color-scheme: dark;
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -112,7 +117,7 @@ section p { margin: 0; }
 .paper .paper-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .paper-links a { font-size: 13.5px; font-weight: 500; line-height: 1; padding: 6px 11px; border: 1px solid var(--border); border-radius: 6px; }
 .paper-links a:hover { border-color: var(--accent); text-decoration: none; }
-.thumb { position: relative; flex: none; width: 260px; aspect-ratio: 2 / 1; background: #fff; border: 1px solid var(--border); border-radius: 8px; }
+.thumb { position: relative; flex: none; width: 260px; aspect-ratio: 2 / 1; background: #fff; border: 1px solid var(--border); border-radius: 8px; filter: brightness(var(--figure-brightness)); }
 .thumb:hover { border-color: var(--accent); }
 .thumb img, .thumb video { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); object-fit: contain; }
 .legend { color: var(--text-secondary); font-size: 14px; }
@@ -140,4 +145,8 @@ section p { margin: 0; }
   .portrait { width: 72px; height: 72px; }
   .links { margin-left: -7px; gap: 0; }
   .links a { width: 36px; height: 36px; }
+}
+
+@media print {
+  .theme-toggle { display: none; }
 }

@@ -352,13 +352,29 @@ class TestStyle(unittest.TestCase):
                     self.assertGreaterEqual(contrast(tokens[fg], tokens[bg]), 4.5)
 
     def test_chosen_theme_overrides_the_system_one(self):
-        system = css_tokens(self.css, "@media (prefers-color-scheme: dark)")
+        system = css_tokens(self.css, "@media screen and (prefers-color-scheme: dark)")
         chosen = css_tokens(self.css, ':root[data-theme="dark"] {')
         self.assertGreater(len(system), 5)
         self.assertEqual(system, chosen)
-        self.assertRegex(self.css, r'@media \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme="light"\]\)\s*\{')
+        self.assertRegex(self.css, r'@media screen and \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme="light"\]\)\s*\{')
         self.assertRegex(self.css, r':root\[data-theme="light"\]\s*\{[^}]*color-scheme:\s*light')
         self.assertRegex(self.css, r':root\[data-theme="dark"\]\s*\{[^}]*color-scheme:\s*dark')
+
+    def test_print_uses_light_colours_and_hides_the_toggle(self):
+        self.assertRegex(self.css, r'@media screen\s*\{\s*:root\[data-theme="dark"\]\s*\{')
+        self.assertNotIn("@media (prefers-color-scheme: dark)", self.css)
+        printing = self.css[self.css.index("@media print"):]
+        self.assertRegex(printing, r"\.theme-toggle\s*\{[^}]*display:\s*none")
+
+    def test_figures_are_dimmed_in_dark_mode(self):
+        def brightness(block_start):
+            start = self.css.index(block_start)
+            return re.search(r"--figure-brightness:\s*([\d.]+)", self.css[start:self.css.index("}", start)]).group(1)
+        dark = brightness(':root[data-theme="dark"] {')
+        self.assertEqual(brightness(":root {"), "1")
+        self.assertEqual(brightness("@media screen and (prefers-color-scheme: dark)"), dark)
+        self.assertLess(float(dark), 1)
+        self.assertRegex(self.css, r"\.thumb\s*\{[^}]*filter:\s*brightness\(var\(--figure-brightness\)\)")
 
     def test_theme_toggle_sits_in_the_top_corner(self):
         self.assertRegex(self.css, r"\.page\s*\{[^}]*position:\s*relative")
@@ -470,6 +486,15 @@ class TestSeo(unittest.TestCase):
         self.assertTrue(self.meta("property", "og:title"))
         self.assertTrue(self.meta("property", "og:description"))
         self.assertEqual(self.meta("name", "twitter:card"), "summary")
+
+    def test_previews_use_the_page_role_and_venues(self):
+        for name, desc in [("description", self.meta("name", "description")),
+                           ("og:description", self.meta("property", "og:description"))]:
+            with self.subTest(meta=name):
+                self.assertIn("machine learning researcher", desc.lower())
+                self.assertNotIn("Research Engineer", desc)
+                for venue in ("ICML", "ICLR", "NeurIPS"):
+                    self.assertIn(venue, desc)
 
     def test_json_ld(self):
         blocks = [s for s in find_all(self.doc, "script", attr=("type", "application/ld+json"))]
