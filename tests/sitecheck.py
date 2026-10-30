@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
-NOT_PUBLISHED = {".git", ".superpowers", "tests"}
+NOT_PUBLISHED = {".git", ".superpowers"}
 
 
 class Node:

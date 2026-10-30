@@ -112,7 +112,9 @@
 </div>
 <script>
 document.querySelectorAll('a[data-user][data-domain]').forEach(function (a) {
-  a.href = 'mailto:' + a.getAttribute('data-user') + '@' + a.getAttribute('data-domain');
+  var address = a.getAttribute('data-user') + '@' + a.getAttribute('data-domain');
+  a.href = 'mailto:' + address;
+  a.textContent = address;
 });
 </script>
 </body>

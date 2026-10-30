@@ -111,13 +111,17 @@ class TestIntro(unittest.TestCase):
         self.assertIn("mailto:", script)
         self.assertIn("data-user", script)
 
+    def test_email_address_shown_as_link_text(self):
+        script = " ".join(text_of_scripts(self.doc))
+        self.assertIn("textContent", script)
+
     def test_email_noscript_fallback(self):
         self.assertIn("mk940se [at] gmail.com", text(find(self.intro, "noscript")))
 
     def test_no_plaintext_email_anywhere(self):
+        address = ("mk940se" + "@" + "gmail.com").encode()
         for path in site_files():
-            if path.suffix in {".html", ".css", ".xml", ".txt", ".md"}:
-                self.assertNotIn("mk940se" + "@" + "gmail.com", path.read_text(encoding="utf-8"), path)
+            self.assertNotIn(address, path.read_bytes(), path)
 
     def test_portrait_markup(self):
         img = find(self.intro, "img", cls="portrait")
