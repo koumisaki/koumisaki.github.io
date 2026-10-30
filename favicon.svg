@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#2b5c8a"/>
-  <text x="32" y="45" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#fbfaf7">K</text>
+  <path d="M32 15 18 32M32 15 46 32M46 32v17" stroke="#fbfaf7" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#fbfaf7">
+    <circle cx="32" cy="15" r="6.5"/>
+    <circle cx="18" cy="32" r="6.5"/>
+    <circle cx="46" cy="32" r="6.5"/>
+    <circle cx="46" cy="49" r="6.5"/>
+  </g>
 </svg>

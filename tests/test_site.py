@@ -490,6 +490,11 @@ class TestSeo(unittest.TestCase):
         self.assertIsNotNone(find(self.doc, "link", attr=("href", "/favicon.svg")))
         self.assertTrue((ROOT / "favicon.svg").exists())
 
+    def test_favicon_is_a_search_tree_drawn_without_fonts(self):
+        icon = parse("favicon.svg")
+        self.assertEqual(find_all(icon, "text"), [])
+        self.assertEqual(len(find_all(icon, "circle")), 4)
+
     def test_robots_and_sitemap(self):
         robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
         self.assertIn("Sitemap: https://koumisaki.com/sitemap.xml", robots)
