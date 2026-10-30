@@ -40,9 +40,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
 <link rel="stylesheet" href="/style.css">
+<script>
+try {
+  var theme = localStorage.getItem('theme');
+  if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+} catch (e) {}
+</script>
 </head>
 <body>
 <div class="page">
+<button class="theme-toggle" type="button" aria-label="Switch theme" title="Switch theme" hidden><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15A8.5 8.5 0 0 1 9 4a8.5 8.5 0 1 0 11 11z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3m0 15v3M1.5 12h3m15 0h3M4.6 4.6l2.1 2.1m10.6 10.6 2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 <main>
 <header class="profile">
 <div class="intro">
@@ -77,7 +84,7 @@
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>diffusion language models</li><li>MCTS</li></ul>
 </div>
-<a class="thumb" href="https://pub.sakana.ai/umf/" tabindex="-1" aria-hidden="true"><img src="/images/papers/unmaskfork.webp" width="720" height="280" alt="" loading="lazy" decoding="async"></a>
+<a class="thumb" href="https://pub.sakana.ai/umf/" tabindex="-1" aria-hidden="true"><video src="/images/papers/umf.mp4" poster="/images/papers/umf-poster.webp" width="500" height="344" muted loop playsinline preload="none"></video></a>
 </div>
 <p class="tldr">We propose an inference-time scaling method for masked diffusion language models in which multiple models collaborate during unmasking, with Monte Carlo tree search choosing among their deterministic unmasking steps. It outperforms existing inference-time scaling methods on coding benchmarks and scales well on math reasoning.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> <a href="https://pub.sakana.ai/umf/">Blog</a></p>
@@ -90,7 +97,7 @@
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>prompting</li><li>output diversity</li><li>probabilistic instruction following</li></ul>
 </div>
-<a class="thumb" href="https://pub.sakana.ai/ssot/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ssot.webp" width="720" height="378" alt="" loading="lazy" decoding="async"></a>
+<a class="thumb" href="https://pub.sakana.ai/ssot/" tabindex="-1" aria-hidden="true"><video src="/images/papers/ssot.mp4" poster="/images/papers/ssot-poster.webp" width="720" height="290" muted loop playsinline preload="none"></video></a>
 </div>
 <p class="tldr">LLMs often fail to make choices according to given probabilities: asked to flip a fair coin, they don't return heads and tails equally often. We show that prompting alone largely fixes this. Asking the model to first write a random string and then derive its answer from it brings its choices close to the target probabilities and makes open-ended answers more diverse.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> <a href="https://pub.sakana.ai/ssot/">Blog</a></p>
@@ -149,6 +156,49 @@ document.querySelectorAll('a[data-user][data-domain]').forEach(function (a) {
   a.href = 'mailto:' + address;
   if (a.classList.contains('email-address')) a.textContent = address;
 });
+
+(function () {
+  var toggle = document.querySelector('.theme-toggle');
+  var system = matchMedia('(prefers-color-scheme: dark)');
+  function saved() {
+    try { return localStorage.getItem('theme'); } catch (e) { return null; }
+  }
+  function current() {
+    var theme = saved();
+    return theme === 'light' || theme === 'dark' ? theme : system.matches ? 'dark' : 'light';
+  }
+  function show(theme) {
+    var label = 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' theme';
+    document.documentElement.dataset.theme = theme;
+    toggle.setAttribute('aria-label', label);
+    toggle.title = label;
+  }
+  toggle.addEventListener('click', function () {
+    var theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    try {
+      // Choosing what the system already shows means "follow the system" again.
+      if (theme === (system.matches ? 'dark' : 'light')) localStorage.removeItem('theme');
+      else localStorage.setItem('theme', theme);
+    } catch (e) {}
+    show(theme);
+  });
+  system.addEventListener('change', function () { show(current()); });
+  show(current());
+  toggle.hidden = false;
+})();
+
+(function () {
+  // Play the figure animations only while on screen, and never for people who ask for less motion.
+  var videos = document.querySelectorAll('.thumb video');
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) entry.target.play().catch(function () {});
+      else entry.target.pause();
+    });
+  }, { threshold: 0.5 });
+  videos.forEach(function (video) { observer.observe(video); });
+})();
 </script>
 </body>
 </html>

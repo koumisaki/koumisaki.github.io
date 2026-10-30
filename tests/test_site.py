@@ -68,9 +68,15 @@ KEYWORDS = {
 }
 
 THUMBNAILS = {
-    "2602.04344": ("/images/papers/unmaskfork.webp", "https://pub.sakana.ai/umf/"),
-    "2510.21150": ("/images/papers/ssot.webp", "https://pub.sakana.ai/ssot/"),
+    "2602.04344": ("/images/papers/umf-poster.webp", "https://pub.sakana.ai/umf/"),
+    "2510.21150": ("/images/papers/ssot-poster.webp", "https://pub.sakana.ai/ssot/"),
     "2503.04412": ("/images/papers/ab-mcts-schematic.webp", "https://sakana.ai/ab-mcts/"),
+}
+
+# Blog animations recorded as short loops; their THUMBNAILS entry is the still shown before playing.
+VIDEOS = {
+    "2602.04344": "/images/papers/umf.mp4",
+    "2510.21150": "/images/papers/ssot.mp4",
 }
 
 LINKS = [
@@ -102,6 +108,13 @@ class TestSkeleton(unittest.TestCase):
 
     def test_stylesheet_linked(self):
         self.assertIsNotNone(find(self.doc, "link", attr=("href", "/style.css")))
+
+    def test_every_image_is_used(self):
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        for path in (ROOT / "images").rglob("*"):
+            if path.is_file():
+                with self.subTest(path=path.name):
+                    self.assertIn("/" + path.relative_to(ROOT).as_posix(), html)
 
     def test_nojekyll_present(self):
         self.assertTrue((ROOT / ".nojekyll").exists())
@@ -267,18 +280,32 @@ class TestPublications(unittest.TestCase):
     def test_research_papers_show_their_blog_figure(self):
         for li in find_all(self.first, "li", cls="paper"):
             arxiv = li.attrs["data-arxiv"]
-            src, href = THUMBNAILS[arxiv]
+            still, href = THUMBNAILS[arxiv]
             with self.subTest(arxiv=arxiv):
                 link = elements(elements(li)[0])[1]
                 self.assertEqual((link.tag, link.classes, link.attrs.get("href")), ("a", ["thumb"], href))
                 self.assertEqual((link.attrs.get("tabindex"), link.attrs.get("aria-hidden")), ("-1", "true"))
-                img = find(link, "img")
-                self.assertEqual((img.attrs.get("src"), img.attrs.get("loading")), (src, "lazy"))
-                self.assertTrue(img.attrs.get("width") and img.attrs.get("height"))
-                path = ROOT / src.lstrip("/")
+                media = elements(link)[0]
+                self.assertTrue(media.attrs.get("width") and media.attrs.get("height"))
+                if arxiv in VIDEOS:
+                    self.assertEqual((media.tag, media.attrs.get("src"), media.attrs.get("poster")),
+                                     ("video", VIDEOS[arxiv], still))
+                    self.assertTrue({"muted", "loop", "playsinline"} <= media.attrs.keys())
+                    self.assertEqual(media.attrs.get("preload"), "none")
+                    self.assertNotIn("autoplay", media.attrs)
+                    self.assertLess((ROOT / VIDEOS[arxiv].lstrip("/")).stat().st_size, 200_000)
+                else:
+                    self.assertEqual((media.tag, media.attrs.get("src"), media.attrs.get("loading")),
+                                     ("img", still, "lazy"))
+                path = ROOT / still.lstrip("/")
                 self.assertTrue(path.exists(), path)
                 self.assertLess(path.stat().st_size, 80_000)
         self.assertIsNone(find(self.other, "a", cls="thumb"))
+
+    def test_videos_play_only_in_view_and_not_for_reduced_motion(self):
+        script = " ".join(text_of_scripts(self.doc))
+        self.assertIn("IntersectionObserver", script)
+        self.assertIn("(prefers-reduced-motion: reduce)", script)
 
     def test_summaries_state_each_contribution(self):
         expected = {
@@ -316,13 +343,26 @@ class TestStyle(unittest.TestCase):
 
     def test_contrast_ratios(self):
         light = css_tokens(self.css, ":root {")
-        dark = css_tokens(self.css, "@media (prefers-color-scheme: dark)")
+        dark = css_tokens(self.css, ':root[data-theme="dark"] {')
         pairs = [("--text", "--bg"), ("--text-secondary", "--bg"), ("--accent", "--bg"),
                  ("--badge-text", "--badge-bg"), ("--award-text", "--award-bg"), ("--text-secondary", "--tag-bg")]
         for name, tokens in [("light", light), ("dark", dark)]:
             for fg, bg in pairs:
                 with self.subTest(mode=name, pair=(fg, bg)):
                     self.assertGreaterEqual(contrast(tokens[fg], tokens[bg]), 4.5)
+
+    def test_chosen_theme_overrides_the_system_one(self):
+        system = css_tokens(self.css, "@media (prefers-color-scheme: dark)")
+        chosen = css_tokens(self.css, ':root[data-theme="dark"] {')
+        self.assertGreater(len(system), 5)
+        self.assertEqual(system, chosen)
+        self.assertRegex(self.css, r'@media \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme="light"\]\)\s*\{')
+        self.assertRegex(self.css, r':root\[data-theme="light"\]\s*\{[^}]*color-scheme:\s*light')
+        self.assertRegex(self.css, r':root\[data-theme="dark"\]\s*\{[^}]*color-scheme:\s*dark')
+
+    def test_theme_toggle_sits_in_the_top_corner(self):
+        self.assertRegex(self.css, r"\.page\s*\{[^}]*position:\s*relative")
+        self.assertRegex(self.css, r"\.theme-toggle\s*\{[^}]*position:\s*absolute")
 
     def test_font_fallbacks(self):
         self.assertRegex(self.css, r"--font-serif:[^;]*Newsreader[^;]*,\s*serif;")
@@ -356,8 +396,8 @@ class TestStyle(unittest.TestCase):
 
     def test_thumbnails_show_the_whole_figure_and_lead_on_phones(self):
         self.assertRegex(self.css, r"\.thumb\s*\{[^}]*aspect-ratio:\s*2\s*/\s*1")
-        self.assertRegex(self.css, r"\.thumb img\s*\{[^}]*object-fit:\s*contain")
-        self.assertRegex(self.css, r"\.thumb img\s*\{[^}]*position:\s*absolute")
+        self.assertRegex(self.css, r"\.thumb img,\s*\.thumb video\s*\{[^}]*object-fit:\s*contain")
+        self.assertRegex(self.css, r"\.thumb img,\s*\.thumb video\s*\{[^}]*position:\s*absolute")
         mobile = self.css[self.css.index("@media (max-width: 600px)"):]
         self.assertRegex(mobile, r"\.thumb\s*\{[^}]*order:\s*-1")
 
@@ -376,6 +416,30 @@ class TestStyle(unittest.TestCase):
         self.assertTrue(any("fonts.googleapis.com/css2" in h and "Newsreader" in h and "Inter" in h for h in hrefs))
         footer = find(doc, "footer", cls="footer")
         self.assertIn("Last updated: October 2026", [text(p) for p in find_all(footer, "p")])
+
+
+class TestThemeToggle(unittest.TestCase):
+    def setUp(self):
+        self.doc = parse("index.html")
+
+    def test_toggle_is_first_on_the_page_and_waits_for_script(self):
+        button = elements(find(self.doc, "div", cls="page"))[0]
+        self.assertEqual((button.tag, button.classes, button.attrs.get("type")), ("button", ["theme-toggle"], "button"))
+        self.assertIn("hidden", button.attrs)
+        self.assertTrue(button.attrs.get("aria-label"))
+        self.assertEqual(len(find_all(button, "svg")), 2)
+
+    def test_toggle_remembers_the_choice(self):
+        script = " ".join(text_of_scripts(self.doc))
+        self.assertIn("localStorage.setItem", script)
+        self.assertIn("localStorage.removeItem", script)
+
+    def test_saved_theme_applies_before_the_page_paints(self):
+        for name in ("index.html", "404.html"):
+            with self.subTest(page=name):
+                head = find(parse(name), "head")
+                early = [s for s in text_of_scripts(head) if "localStorage" in s]
+                self.assertTrue(early and "dataset.theme" in early[0])
 
 
 SAME_AS = [
