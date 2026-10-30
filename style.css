@@ -69,7 +69,7 @@ h2 { font-family: var(--font-serif); font-weight: 500; font-size: 26px; line-hei
 section p { margin: 0; }
 
 .papers { list-style: none; padding: 0; margin: 0; }
-.paper { margin: 0 0 32px; display: flex; gap: 24px; align-items: flex-start; }
+.paper { margin: 0 0 32px; display: flex; gap: 24px; align-items: center; }
 .paper-body { flex: 1; min-width: 0; }
 .paper p { margin: 4px 0 0; }
 .paper .venue { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }

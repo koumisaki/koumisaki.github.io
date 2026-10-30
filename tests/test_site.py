@@ -342,6 +342,9 @@ class TestStyle(unittest.TestCase):
     def test_icons_follow_text_colour(self):
         self.assertRegex(self.css, r"\.links svg\s*\{[^}]*fill:\s*currentColor")
 
+    def test_thumbnails_are_centred_beside_their_paper(self):
+        self.assertRegex(self.css, r"\.paper\s*\{[^}]*align-items:\s*center")
+
     def test_thumbnails_show_the_whole_figure_and_lead_on_phones(self):
         self.assertRegex(self.css, r"\.thumb\s*\{[^}]*aspect-ratio:\s*2\s*/\s*1")
         self.assertRegex(self.css, r"\.thumb img\s*\{[^}]*object-fit:\s*contain")
