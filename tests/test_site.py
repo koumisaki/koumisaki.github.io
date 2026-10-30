@@ -1,3 +1,4 @@
+import json
 import re
 import unittest
 
@@ -208,6 +209,70 @@ class TestStyle(unittest.TestCase):
         hrefs = [l.attrs.get("href", "") for l in find_all(doc, "link")]
         self.assertTrue(any("fonts.googleapis.com/css2" in h and "Newsreader" in h and "Inter" in h for h in hrefs))
         self.assertEqual(text(find(doc, "footer", cls="footer")), "Last updated: October 2026")
+
+
+SAME_AS = [
+    "https://scholar.google.com/citations?user=8kL-3m4AAAAJ",
+    "https://github.com/takkyu2",
+    "https://x.com/takkyuO2",
+    "https://www.linkedin.com/in/kou-misaki/",
+]
+
+
+class TestSeo(unittest.TestCase):
+    def setUp(self):
+        self.doc = parse("index.html")
+
+    def meta(self, attr, value):
+        node = find(self.doc, "meta", attr=(attr, value))
+        return node.attrs.get("content") if node else None
+
+    def test_description_and_canonical(self):
+        desc = self.meta("name", "description")
+        self.assertTrue(desc and 50 <= len(desc) <= 160, desc)
+        self.assertIsNotNone(find(self.doc, "link", attr=("rel", "canonical")))
+        self.assertEqual(find(self.doc, "link", attr=("rel", "canonical")).attrs["href"], "https://koumisaki.com/")
+
+    def test_open_graph_and_card(self):
+        self.assertEqual(self.meta("property", "og:type"), "profile")
+        self.assertEqual(self.meta("property", "og:url"), "https://koumisaki.com/")
+        self.assertEqual(self.meta("property", "og:image"), "https://koumisaki.com/images/portrait.jpg")
+        self.assertTrue(self.meta("property", "og:title"))
+        self.assertTrue(self.meta("property", "og:description"))
+        self.assertEqual(self.meta("name", "twitter:card"), "summary")
+
+    def test_json_ld(self):
+        blocks = [s for s in find_all(self.doc, "script", attr=("type", "application/ld+json"))]
+        self.assertEqual(len(blocks), 1)
+        data = json.loads("".join(c for c in blocks[0].children if isinstance(c, str)))
+        self.assertEqual(data["@type"], "ProfilePage")
+        person = data["mainEntity"]
+        self.assertEqual(person["@type"], "Person")
+        self.assertEqual(person["name"], "Kou Misaki")
+        self.assertEqual(person["alternateName"], "三崎 航")
+        self.assertEqual(person["url"], "https://koumisaki.com/")
+        self.assertEqual(person["worksFor"]["name"], "Sakana AI")
+        self.assertEqual(person["alumniOf"]["name"], "The University of Tokyo")
+        self.assertEqual(person["sameAs"], SAME_AS)
+        self.assertNotIn("email", person)
+
+    def test_favicon(self):
+        self.assertIsNotNone(find(self.doc, "link", attr=("href", "/favicon.svg")))
+        self.assertTrue((ROOT / "favicon.svg").exists())
+
+    def test_robots_and_sitemap(self):
+        robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
+        self.assertIn("Sitemap: https://koumisaki.com/sitemap.xml", robots)
+        sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn("<loc>https://koumisaki.com/</loc>", sitemap)
+        self.assertIn("<lastmod>2026-10-31</lastmod>", sitemap)
+
+    def test_404_links_home(self):
+        page = parse("404.html")
+        self.assertIn("/", [a.attrs.get("href") for a in find_all(page, "a")])
+        self.assertEqual(find(page, "meta", attr=("name", "robots")).attrs.get("content"), "noindex")
+        self.assertIsNotNone(find(page, "link", attr=("href", "/style.css")))
+        self.assertEqual(find(page, "html").attrs.get("lang"), "en")
 
 
 if __name__ == "__main__":
