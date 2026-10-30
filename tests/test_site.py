@@ -437,6 +437,20 @@ class TestStyle(unittest.TestCase):
         self.assertIn("Last updated: October 2026", [text(p) for p in find_all(footer, "p")])
 
 
+class TestAnalytics(unittest.TestCase):
+    def test_cloudflare_web_analytics_loads_last_on_the_home_page(self):
+        body = find(parse("index.html"), "body")
+        beacon = elements(body)[-1]
+        self.assertEqual((beacon.tag, beacon.attrs.get("src")),
+                         ("script", "https://static.cloudflareinsights.com/beacon.min.js"))
+        self.assertEqual(beacon.attrs.get("type"), "module")
+        self.assertEqual(json.loads(beacon.attrs["data-cf-beacon"]), {"token": "d198c67b490f4a3fb7ee328d63b85a4e"})
+
+    def test_no_other_third_party_scripts(self):
+        srcs = [s.attrs["src"] for s in find_all(parse("index.html"), "script", attr=("src", None))]
+        self.assertEqual(srcs, ["https://static.cloudflareinsights.com/beacon.min.js"])
+
+
 class TestThemeToggle(unittest.TestCase):
     def setUp(self):
         self.doc = parse("index.html")

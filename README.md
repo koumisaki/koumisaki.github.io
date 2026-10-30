@@ -9,4 +9,6 @@ Kou Misaki's homepage, served by GitHub Pages at https://koumisaki.com/. No buil
 - Change the footer date in `index.html` and `<lastmod>` in `sitemap.xml` whenever the content changes.
 - Check before pushing: `python3 -m unittest discover -s tests -v` and `python3 tests/check_links.py`.
 
+Visits are counted with Cloudflare Web Analytics (no cookies); the dashboard is under Web Analytics in the Cloudflare account.
+
 Brand icons come from [Simple Icons](https://simpleicons.org/) (CC0); the envelope icon was drawn for this site.
