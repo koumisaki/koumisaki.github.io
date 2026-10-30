@@ -77,7 +77,6 @@ LINKS = [
     ("Email", "#"),
     ("Google Scholar", "https://scholar.google.com/citations?user=8kL-3m4AAAAJ"),
     ("GitHub", "https://github.com/takkyu2"),
-    ("X", "https://x.com/takkyuO2"),
     ("LinkedIn", "https://www.linkedin.com/in/kou-misaki/"),
 ]
 
@@ -129,8 +128,8 @@ class TestProfile(unittest.TestCase):
 
     def test_lead_sentence(self):
         self.assertEqual(text(find(self.profile, "p", cls="lead")),
-                         "I work on inference-time scaling: getting better answers from large language models "
-                         "by spending more compute at test time.")
+                         "I research methods that make large language models perform better by spending more "
+                         "compute at inference time, an approach known as inference-time scaling.")
 
     def test_key_facts(self):
         facts = find(self.profile, "dl", cls="facts")
@@ -145,6 +144,9 @@ class TestProfile(unittest.TestCase):
         raw = "".join(c for c in dd.children if isinstance(c, str))
         for venue in ["ICML\xa02026", "ICLR\xa02026", "NeurIPS\xa02025\xa0(Spotlight)"]:
             self.assertIn(venue, raw)
+
+    def test_no_x_account(self):
+        self.assertNotIn("x.com", (ROOT / "index.html").read_text(encoding="utf-8"))
 
     def test_no_bio_paragraph(self):
         self.assertIsNone(find(self.doc, "p", cls="bio"))
@@ -269,10 +271,18 @@ class TestPublications(unittest.TestCase):
                 self.assertLess(path.stat().st_size, 80_000)
         self.assertIsNone(find(self.other, "a", cls="thumb"))
 
-    def test_ab_mcts_named_and_treequest_credited(self):
-        tldr = text(find(self.paper("2503.04412"), "p", cls="tldr"))
-        self.assertIn("Introduces AB-MCTS", tldr)
-        self.assertIn("I also developed TreeQuest", tldr)
+    def test_summaries_state_each_contribution(self):
+        expected = {
+            "2602.04344": ["masked diffusion language models", "several models collaborate",
+                           "Monte Carlo tree search", "coding benchmarks", "math"],
+            "2510.21150": ["fair coin", "prompting alone", "random string", "more diverse"],
+            "2503.04412": ["We propose AB-MCTS", "Bayesian", "refine an existing one", "I also developed TreeQuest"],
+        }
+        for arxiv, phrases in expected.items():
+            tldr = text(find(self.paper(arxiv), "p", cls="tldr"))
+            for phrase in phrases:
+                with self.subTest(arxiv=arxiv, phrase=phrase):
+                    self.assertIn(phrase, tldr)
 
     def test_equal_contribution(self):
         authors = text(find(self.paper("2503.04412"), "p", cls="authors"))
@@ -358,7 +368,6 @@ class TestStyle(unittest.TestCase):
 SAME_AS = [
     "https://scholar.google.com/citations?user=8kL-3m4AAAAJ",
     "https://github.com/takkyu2",
-    "https://x.com/takkyuO2",
     "https://www.linkedin.com/in/kou-misaki/",
 ]
 

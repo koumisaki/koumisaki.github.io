@@ -5,7 +5,7 @@ import urllib.request
 
 from sitecheck import find_all, parse
 
-UNVERIFIABLE = {"www.linkedin.com", "x.com"}  # these block scripted requests (999 / 403)
+UNVERIFIABLE = {"www.linkedin.com"}  # blocks scripted requests (999)
 OWN_HOST = "koumisaki.com"  # canonical self-references; checked when the domain goes live
 
 

@@ -31,7 +31,6 @@
     "sameAs": [
       "https://scholar.google.com/citations?user=8kL-3m4AAAAJ",
       "https://github.com/takkyu2",
-      "https://x.com/takkyuO2",
       "https://www.linkedin.com/in/kou-misaki/"
     ]
   }
@@ -54,13 +53,12 @@
 <li><a class="email" href="#" data-user="mk940se" data-domain="gmail.com" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h20a2 2 0 0 1 2 2v.4l-12 7.2L0 6.4V6a2 2 0 0 1 2-2zm-2 4.7 12 7.2 12-7.2V18a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2z"/></svg></a></li>
 <li><a href="https://scholar.google.com/citations?user=8kL-3m4AAAAJ" aria-label="Google Scholar" title="Google Scholar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg></a></li>
 <li><a href="https://github.com/takkyu2" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a></li>
-<li><a href="https://x.com/takkyuO2" aria-label="X" title="X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg></a></li>
 <li><a href="https://www.linkedin.com/in/kou-misaki/" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a></li>
 </ul>
 </div>
 <img class="portrait" src="/images/portrait.jpg" width="112" height="112" alt="Portrait of Kou Misaki">
 </div>
-<p class="lead">I work on inference-time scaling: getting better answers from large language models by spending more compute at test time.</p>
+<p class="lead">I research methods that make large language models perform better by spending more compute at inference time, an approach known as inference-time scaling.</p>
 <dl class="facts">
 <dt>First-author papers</dt><dd>ICML&nbsp;2026, ICLR&nbsp;2026, NeurIPS&nbsp;2025&nbsp;(Spotlight)</dd>
 <dt>Before Sakana AI</dt><dd>Apple (Japanese Siri), Recruit</dd>
@@ -77,7 +75,7 @@
 <a class="paper-title" href="https://arxiv.org/abs/2602.04344">UnMaskFork: Test-Time Scaling for Masked Diffusion via Deterministic Action Branching</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>diffusion language models</li><li>MCTS</li></ul>
-<p class="tldr">Treats unmasking in diffusion language models as a search tree; deterministic branching with Monte Carlo tree search beats existing test-time scaling baselines on coding and scales well on math.</p>
+<p class="tldr">We propose an inference-time scaling method for masked diffusion language models in which several models collaborate during unmasking, with Monte Carlo tree search choosing among their deterministic unmasking steps. It outperforms existing inference-time scaling methods on coding benchmarks and scales well on math reasoning.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> <a href="https://pub.sakana.ai/umf/">Blog</a></p>
 </div>
 <a class="thumb" href="https://pub.sakana.ai/umf/" tabindex="-1" aria-hidden="true"><img src="/images/papers/unmaskfork.webp" width="720" height="280" alt="" loading="lazy" decoding="async"></a>
@@ -88,7 +86,7 @@
 <a class="paper-title" href="https://arxiv.org/abs/2510.21150">String Seed of Thought: Prompting LLMs for Distribution-Faithful and Diverse Generation</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>prompting</li><li>output diversity</li><li>probabilistic instruction following</li></ul>
-<p class="tldr">Asking an LLM to first write a random string and derive its answer from it brings its sampling close to a pseudo-random number generator and makes open-ended responses more diverse.</p>
+<p class="tldr">LLMs often fail to choose according to given probabilities: asked to flip a fair coin, they don't return heads and tails equally often. We show that prompting alone largely fixes this. Asking the model to first write a random string and then derive its answer from it brings its choices close to the target probabilities and makes open-ended answers more diverse.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> <a href="https://pub.sakana.ai/ssot/">Blog</a></p>
 </div>
 <a class="thumb" href="https://pub.sakana.ai/ssot/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ssot.webp" width="720" height="378" alt="" loading="lazy" decoding="async"></a>
@@ -99,7 +97,7 @@
 <a class="paper-title" href="https://arxiv.org/abs/2503.04412">Wider or Deeper? Scaling LLM Inference-Time Compute with Adaptive Branching Tree Search</a>
 <p class="authors">Yuichi Inoue*, <strong>Kou Misaki</strong>*, Yuki Imajuku, So Kuroki, Taishi Nakamura, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>MCTS</li><li>Bayesian modeling</li></ul>
-<p class="tldr">Introduces AB-MCTS, a tree search that uses feedback to decide whether to sample new answers or refine existing ones, outperforming repeated sampling and standard MCTS on coding and engineering tasks with frontier models. I also developed TreeQuest, its open-source library.</p>
+<p class="tldr">We propose AB-MCTS, an inference-time scaling method for LLMs that extends Monte Carlo tree search: using Bayesian modeling of feedback, it decides at each step whether to sample a new answer or refine an existing one. Across a range of coding and engineering tasks, it consistently outperforms repeated sampling and standard MCTS. I also developed TreeQuest, its open-source library.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2503.04412">arXiv</a> <a href="https://github.com/SakanaAI/treequest">TreeQuest</a> <a href="https://sakana.ai/ab-mcts/">Blog</a></p>
 </div>
 <a class="thumb" href="https://sakana.ai/ab-mcts/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ab-mcts.webp" width="720" height="369" alt="" loading="lazy" decoding="async"></a>
