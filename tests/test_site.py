@@ -273,10 +273,11 @@ class TestPublications(unittest.TestCase):
 
     def test_summaries_state_each_contribution(self):
         expected = {
-            "2602.04344": ["masked diffusion language models", "several models collaborate",
+            "2602.04344": ["masked diffusion language models", "multiple models collaborate",
                            "Monte Carlo tree search", "coding benchmarks", "math"],
-            "2510.21150": ["fair coin", "prompting alone", "random string", "more diverse"],
-            "2503.04412": ["We propose AB-MCTS", "Bayesian", "refine an existing one", "I also developed TreeQuest"],
+            "2510.21150": ["make choices according to given probabilities", "fair coin", "prompting alone", "random string", "more diverse"],
+            "2503.04412": ["We propose AB-MCTS", "Bayesian", "refine an existing one",
+                           "As part of this work, I developed TreeQuest"],
         }
         for arxiv, phrases in expected.items():
             tldr = text(find(self.paper(arxiv), "p", cls="tldr"))

@@ -75,7 +75,7 @@
 <a class="paper-title" href="https://arxiv.org/abs/2602.04344">UnMaskFork: Test-Time Scaling for Masked Diffusion via Deterministic Action Branching</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>diffusion language models</li><li>MCTS</li></ul>
-<p class="tldr">We propose an inference-time scaling method for masked diffusion language models in which several models collaborate during unmasking, with Monte Carlo tree search choosing among their deterministic unmasking steps. It outperforms existing inference-time scaling methods on coding benchmarks and scales well on math reasoning.</p>
+<p class="tldr">We propose an inference-time scaling method for masked diffusion language models in which multiple models collaborate during unmasking, with Monte Carlo tree search choosing among their deterministic unmasking steps. It outperforms existing inference-time scaling methods on coding benchmarks and scales well on math reasoning.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2602.04344">arXiv</a> <a href="https://pub.sakana.ai/umf/">Blog</a></p>
 </div>
 <a class="thumb" href="https://pub.sakana.ai/umf/" tabindex="-1" aria-hidden="true"><img src="/images/papers/unmaskfork.webp" width="720" height="280" alt="" loading="lazy" decoding="async"></a>
@@ -86,7 +86,7 @@
 <a class="paper-title" href="https://arxiv.org/abs/2510.21150">String Seed of Thought: Prompting LLMs for Distribution-Faithful and Diverse Generation</a>
 <p class="authors"><strong>Kou Misaki</strong>, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>prompting</li><li>output diversity</li><li>probabilistic instruction following</li></ul>
-<p class="tldr">LLMs often fail to choose according to given probabilities: asked to flip a fair coin, they don't return heads and tails equally often. We show that prompting alone largely fixes this. Asking the model to first write a random string and then derive its answer from it brings its choices close to the target probabilities and makes open-ended answers more diverse.</p>
+<p class="tldr">LLMs often fail to make choices according to given probabilities: asked to flip a fair coin, they don't return heads and tails equally often. We show that prompting alone largely fixes this. Asking the model to first write a random string and then derive its answer from it brings its choices close to the target probabilities and makes open-ended answers more diverse.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2510.21150">arXiv</a> <a href="https://pub.sakana.ai/ssot/">Blog</a></p>
 </div>
 <a class="thumb" href="https://pub.sakana.ai/ssot/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ssot.webp" width="720" height="378" alt="" loading="lazy" decoding="async"></a>
@@ -97,7 +97,7 @@
 <a class="paper-title" href="https://arxiv.org/abs/2503.04412">Wider or Deeper? Scaling LLM Inference-Time Compute with Adaptive Branching Tree Search</a>
 <p class="authors">Yuichi Inoue*, <strong>Kou Misaki</strong>*, Yuki Imajuku, So Kuroki, Taishi Nakamura, Takuya Akiba</p>
 <ul class="keywords" role="list"><li>inference-time scaling</li><li>MCTS</li><li>Bayesian modeling</li></ul>
-<p class="tldr">We propose AB-MCTS, an inference-time scaling method for LLMs that extends Monte Carlo tree search: using Bayesian modeling of feedback, it decides at each step whether to sample a new answer or refine an existing one. Across a range of coding and engineering tasks, it consistently outperforms repeated sampling and standard MCTS. I also developed TreeQuest, its open-source library.</p>
+<p class="tldr">We propose AB-MCTS, an inference-time scaling method for LLMs that extends Monte Carlo tree search: using Bayesian modeling of feedback, it decides at each step whether to sample a new answer or refine an existing one. Across a range of coding and engineering tasks, it consistently outperforms repeated sampling and standard MCTS. As part of this work, I developed TreeQuest, the accompanying open-source library.</p>
 <p class="paper-links"><a href="https://arxiv.org/abs/2503.04412">arXiv</a> <a href="https://github.com/SakanaAI/treequest">TreeQuest</a> <a href="https://sakana.ai/ab-mcts/">Blog</a></p>
 </div>
 <a class="thumb" href="https://sakana.ai/ab-mcts/" tabindex="-1" aria-hidden="true"><img src="/images/papers/ab-mcts.webp" width="720" height="369" alt="" loading="lazy" decoding="async"></a>
