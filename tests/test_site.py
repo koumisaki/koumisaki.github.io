@@ -1,3 +1,4 @@
+import re
 import unittest
 
 from sitecheck import ROOT, find, find_all, parse, site_files, text
@@ -25,6 +26,21 @@ def jpeg_info(path):
 
 def text_of_scripts(doc):
     return ["".join(c for c in s.children if isinstance(c, str)) for s in find_all(doc, "script")]
+
+
+def css_tokens(css, block_start):
+    start = css.index(block_start)
+    block = css[start:css.index("}", start)]
+    return dict(re.findall(r"(--[a-z-]+):\s*(#[0-9a-fA-F]{6})", block))
+
+
+def contrast(a, b):
+    def lum(h):
+        cs = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        cs = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in cs]
+        return 0.2126 * cs[0] + 0.7152 * cs[1] + 0.0722 * cs[2]
+    hi, lo = sorted([lum(a), lum(b)], reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
 
 
 PAPERS = [
@@ -160,6 +176,38 @@ class TestPublications(unittest.TestCase):
 
     def test_no_openreview_links(self):
         self.assertNotIn("openreview.net", (ROOT / "index.html").read_text(encoding="utf-8"))
+
+
+class TestStyle(unittest.TestCase):
+    def setUp(self):
+        self.css = (ROOT / "style.css").read_text(encoding="utf-8")
+
+    def test_contrast_ratios(self):
+        light = css_tokens(self.css, ":root {")
+        dark = css_tokens(self.css, "@media (prefers-color-scheme: dark)")
+        for name, tokens in [("light", light), ("dark", dark)]:
+            for key in ["--text", "--text-secondary", "--accent"]:
+                with self.subTest(mode=name, token=key):
+                    self.assertGreaterEqual(contrast(tokens[key], tokens["--bg"]), 4.5)
+
+    def test_font_fallbacks(self):
+        self.assertRegex(self.css, r"--font-serif:[^;]*Newsreader[^;]*,\s*serif;")
+        self.assertRegex(self.css, r"--font-sans:[^;]*Inter[^;]*,\s*sans-serif;")
+
+    def test_layout_width(self):
+        self.assertIn("max-width: 720px", self.css)
+
+    def test_long_titles_wrap(self):
+        self.assertRegex(self.css, r"\.paper-title\s*\{[^}]*overflow-wrap:\s*anywhere")
+
+    def test_mobile_layout_puts_photo_on_top(self):
+        self.assertRegex(self.css, r"@media \(max-width: 600px\)[\s\S]*\.intro\s*\{[^}]*flex-direction:\s*column-reverse")
+
+    def test_fonts_loaded_and_footer(self):
+        doc = parse("index.html")
+        hrefs = [l.attrs.get("href", "") for l in find_all(doc, "link")]
+        self.assertTrue(any("fonts.googleapis.com/css2" in h and "Newsreader" in h and "Inter" in h for h in hrefs))
+        self.assertEqual(text(find(doc, "footer", cls="footer")), "Last updated: October 2026")
 
 
 if __name__ == "__main__":
