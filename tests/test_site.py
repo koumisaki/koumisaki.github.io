@@ -482,10 +482,18 @@ class TestSeo(unittest.TestCase):
     def test_open_graph_and_card(self):
         self.assertEqual(self.meta("property", "og:type"), "profile")
         self.assertEqual(self.meta("property", "og:url"), "https://koumisaki.com/")
-        self.assertEqual(self.meta("property", "og:image"), "https://koumisaki.com/images/portrait.jpg")
+        self.assertEqual(self.meta("property", "og:image"), "https://koumisaki.com/images/share.png")
+        self.assertEqual((self.meta("property", "og:image:width"), self.meta("property", "og:image:height")), ("1200", "630"))
+        self.assertTrue(self.meta("property", "og:image:alt"))
         self.assertTrue(self.meta("property", "og:title"))
         self.assertTrue(self.meta("property", "og:description"))
-        self.assertEqual(self.meta("name", "twitter:card"), "summary")
+        self.assertEqual(self.meta("name", "twitter:card"), "summary_large_image")
+
+    def test_share_image_is_a_wide_png(self):
+        data = (ROOT / "images" / "share.png").read_bytes()
+        self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual((int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")), (1200, 630))
+        self.assertLess(len(data), 300_000)
 
     def test_previews_use_the_page_role_and_venues(self):
         for name, desc in [("description", self.meta("name", "description")),
