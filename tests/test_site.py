@@ -354,18 +354,16 @@ class TestStyle(unittest.TestCase):
                 with self.subTest(mode=name, pair=(fg, bg)):
                     self.assertGreaterEqual(contrast(tokens[fg], tokens[bg]), 4.5)
 
-    def test_chosen_theme_overrides_the_system_one(self):
-        system = css_tokens(self.css, "@media screen and (prefers-color-scheme: dark)")
-        chosen = css_tokens(self.css, ':root[data-theme="dark"] {')
-        self.assertGreater(len(system), 5)
-        self.assertEqual(system, chosen)
-        self.assertRegex(self.css, r'@media screen and \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme="light"\]\)\s*\{')
-        self.assertRegex(self.css, r':root\[data-theme="light"\]\s*\{[^}]*color-scheme:\s*light')
+    def test_light_is_the_default_whatever_the_system_setting(self):
+        self.assertRegex(self.css, r":root\s*\{[^}]*color-scheme:\s*light;")
         self.assertRegex(self.css, r':root\[data-theme="dark"\]\s*\{[^}]*color-scheme:\s*dark')
+        for name, source in [("style.css", self.css)] + [(page, (ROOT / page).read_text(encoding="utf-8"))
+                                                         for page in ("index.html", "404.html")]:
+            with self.subTest(file=name):
+                self.assertNotIn("prefers-color-scheme", source)
 
     def test_print_uses_light_colours_and_hides_the_toggle(self):
         self.assertRegex(self.css, r'@media screen\s*\{\s*:root\[data-theme="dark"\]\s*\{')
-        self.assertNotIn("@media (prefers-color-scheme: dark)", self.css)
         printing = self.css[self.css.index("@media print"):]
         self.assertRegex(printing, r"\.theme-toggle\s*\{[^}]*display:\s*none")
 
@@ -375,7 +373,6 @@ class TestStyle(unittest.TestCase):
             return re.search(r"--figure-brightness:\s*([\d.]+)", self.css[start:self.css.index("}", start)]).group(1)
         dark = brightness(':root[data-theme="dark"] {')
         self.assertEqual(brightness(":root {"), "1")
-        self.assertEqual(brightness("@media screen and (prefers-color-scheme: dark)"), dark)
         self.assertLess(float(dark), 1)
         self.assertRegex(self.css, r"\.thumb\s*\{[^}]*filter:\s*brightness\(var\(--figure-brightness\)\)")
 
@@ -462,17 +459,18 @@ class TestThemeToggle(unittest.TestCase):
         self.assertTrue(button.attrs.get("aria-label"))
         self.assertEqual(len(find_all(button, "svg")), 2)
 
-    def test_toggle_remembers_the_choice(self):
+    def test_toggle_remembers_only_a_choice_of_dark(self):
         script = " ".join(text_of_scripts(self.doc))
-        self.assertIn("localStorage.setItem", script)
-        self.assertIn("localStorage.removeItem", script)
+        self.assertIn("localStorage.setItem('theme', 'dark')", script)
+        self.assertIn("localStorage.removeItem('theme')", script)
+        self.assertNotIn("localStorage.setItem('theme', theme)", script)
 
     def test_saved_theme_applies_before_the_page_paints(self):
         for name in ("index.html", "404.html"):
             with self.subTest(page=name):
                 head = find(parse(name), "head")
                 early = [s for s in text_of_scripts(head) if "localStorage" in s]
-                self.assertTrue(early and "dataset.theme" in early[0])
+                self.assertTrue(early and "dataset.theme = 'dark'" in early[0])
 
 
 SAME_AS = [

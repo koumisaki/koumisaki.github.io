@@ -13,29 +13,10 @@
   --figure-brightness: 1;
   --font-serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
-/* The theme toggle sets data-theme; without a choice the system setting decides. Print always uses the light colours. */
-:root[data-theme="light"] { color-scheme: light; }
-
-@media screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #151513;
-    --text: #ecebe6;
-    --text-secondary: #a9a69e;
-    --accent: #8fb6de;
-    --border: #2e2d2a;
-    --hover: #232220;
-    --badge-bg: #1d2a38;
-    --badge-text: #b4cfeb;
-    --award-bg: #33291a;
-    --award-text: #ecc98a;
-    --tag-bg: #262522;
-    --figure-brightness: 0.88;
-  }
-}
-
+/* Light unless the visitor picks dark with the toggle. Print always uses the light colours. */
 @media screen {
   :root[data-theme="dark"] {
     --bg: #151513;

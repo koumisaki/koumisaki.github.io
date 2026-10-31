@@ -45,8 +45,7 @@
 <link rel="stylesheet" href="/style.css">
 <script>
 try {
-  var theme = localStorage.getItem('theme');
-  if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+  if (localStorage.getItem('theme') === 'dark') document.documentElement.dataset.theme = 'dark';
 } catch (e) {}
 </script>
 </head>
@@ -163,14 +162,6 @@ document.querySelectorAll('a[data-user][data-domain]').forEach(function (a) {
 
 (function () {
   var toggle = document.querySelector('.theme-toggle');
-  var system = matchMedia('(prefers-color-scheme: dark)');
-  function saved() {
-    try { return localStorage.getItem('theme'); } catch (e) { return null; }
-  }
-  function current() {
-    var theme = saved();
-    return theme === 'light' || theme === 'dark' ? theme : system.matches ? 'dark' : 'light';
-  }
   function show(theme) {
     var label = 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' theme';
     document.documentElement.dataset.theme = theme;
@@ -180,14 +171,13 @@ document.querySelectorAll('a[data-user][data-domain]').forEach(function (a) {
   toggle.addEventListener('click', function () {
     var theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     try {
-      // Choosing what the system already shows means "follow the system" again.
-      if (theme === (system.matches ? 'dark' : 'light')) localStorage.removeItem('theme');
-      else localStorage.setItem('theme', theme);
+      // Light is the default, so only a choice of dark needs remembering.
+      if (theme === 'dark') localStorage.setItem('theme', 'dark');
+      else localStorage.removeItem('theme');
     } catch (e) {}
     show(theme);
   });
-  system.addEventListener('change', function () { show(current()); });
-  show(current());
+  show(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
   toggle.hidden = false;
 })();
 
